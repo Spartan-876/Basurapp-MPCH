@@ -1,0 +1,12 @@
+package com.utp.Basurapp.dto;
+
+import lombok.Data;
+
+@Data
+public class UsuarioDTO {
+    private String nombre;
+    private String fcmToken;
+    private String telefonoFamiliar;
+    private double latitud;
+    private double longitud;
+}
