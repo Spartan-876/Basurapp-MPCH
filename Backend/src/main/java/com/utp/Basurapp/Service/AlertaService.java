@@ -21,6 +21,7 @@ public class AlertaService {
         List<Usuario> usuariosCerca = usuarioRepository.encontrarUsuariosEnRadio(lat, lon, radioMetros);
 
         for (Usuario usuario : usuariosCerca) {
+            System.out.println("Alertado: " +usuario.getNombre());
             enviarNotificacionFirebase(usuario.getFcmToken());
         }
     }

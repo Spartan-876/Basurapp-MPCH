@@ -8,7 +8,10 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -17,13 +20,15 @@ public class UsuarioController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    // Atributo solo de prueba, eliminar en la funcionalidad final
     @Autowired
     private AlertaService alertaService;
+    // ====>
 
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
     @PostMapping("/registrar")
-    public String registrarUsuario(@RequestBody UsuarioDTO dto) {
+    public ResponseEntity<?> registrarUsuario(@RequestBody UsuarioDTO dto) {
         Usuario usuario = new Usuario();
         usuario.setNombre(dto.getNombre());
         usuario.setFcmToken(dto.getFcmToken());
@@ -35,12 +40,15 @@ public class UsuarioController {
         usuario.setUbicacionCasa(punto);
 
         usuarioRepository.save(usuario);
-        return "Usuario registrado con éxito";
+        return ResponseEntity.ok(Map.of("message", "Usuario registrado con éxito"));
     }
 
+    // Metodo solo de prueba, eliminar en la funcionalidad final
     @GetMapping("/prueba-camion")
     public String probarCamion(@RequestParam double lat, @RequestParam double lon) {
         alertaService.procesarUbicacionCamion(lat, lon);
         return "Procesando ubicación del camión...";
     }
+    // ====>
+
 }
