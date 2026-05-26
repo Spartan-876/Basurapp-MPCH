@@ -1,6 +1,7 @@
 package com.utp.basurapp.recolectorapp
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -15,13 +16,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.messaging.FirebaseMessaging
-import com.utp.basurapp.recolectorapp.api.ApiService
+import com.utp.basurapp.recolectorapp.api.RetrofitClient
 import com.utp.basurapp.recolectorapp.data.ApiResponse
 import com.utp.basurapp.recolectorapp.data.UsuarioRequest
+import com.utp.basurapp.recolectorapp.util.SessionManager
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var fusedLocationClient: com.google.android.gms.location.FusedLocationProviderClient
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +35,10 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        sessionManager = SessionManager(this)
+
+        val nombre = sessionManager.getNombre() ?: ""
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -44,21 +51,17 @@ class MainActivity : AppCompatActivity() {
 
         fusedLocationClient = com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(this)
 
+        val etNombre = findViewById<EditText>(R.id.etNombre)
+        if (nombre.isNotEmpty()) etNombre.setText(nombre)
+
         val btnRegistrar = findViewById<Button>(R.id.btnRegistrar)
         btnRegistrar.setOnClickListener {
-            // Verificamos si tenemos permiso
-            if (androidx.core.app.ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                     if (location != null) {
-                        val lat = location.latitude
-                        val lon = location.longitude
-                        println("Ubicación capturada: Lat $lat, Lon $lon")
-
-                        // Aquí llamaremos a la función para enviar al backend
-                        registrarEnBackend(lat, lon)
+                        registrarEnBackend(location.latitude, location.longitude)
                     } else {
-                        Toast.makeText(this, "No se pudo obtener ubicación. Activa el GPS", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "No se pudo obtener ubicacion. Activa el GPS", Toast.LENGTH_SHORT).show()
                     }
                 }
             } else {
@@ -67,7 +70,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         pedirPermisosApp()
-
     }
 
     private fun pedirPermisosApp() {
@@ -77,12 +79,10 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.SEND_SMS
         )
 
-        // Añadimos notificaciones solo si el teléfono es Android 13 o superior
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             listaPermisos.add(Manifest.permission.POST_NOTIFICATIONS)
         }
 
-        // Convertimos la lista a un Array y pedimos todo de golpe
         ActivityCompat.requestPermissions(
             this,
             listaPermisos.toTypedArray(),
@@ -91,51 +91,47 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun registrarEnBackend(lat: Double, lon: Double) {
-        // 1. Obtenemos los datos de la interfaz
         val nombre = findViewById<EditText>(R.id.etNombre).text.toString()
         val telefono = findViewById<EditText>(R.id.etTelefonoFamiliar).text.toString()
         val tvStatus = findViewById<TextView>(R.id.tvStatus)
 
-        // 2. Necesitamos el Token de Firebase de nuevo
         FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
-
-            // 3. Creamos el objeto con los datos (El DTO que hicimos antes)
             val request = UsuarioRequest(
                 nombre = nombre,
+                email = sessionManager.getEmail(),
                 fcmToken = token,
                 telefonoFamiliar = telefono,
                 latitud = lat,
                 longitud = lon
             )
 
-            // 4. Configuramos Retrofit (Usa TU IP de ipconfig aquí)
-            val retrofit = retrofit2.Retrofit.Builder()
-                .baseUrl("http://192.168.18.56:8080/") // <-- CAMBIA LA XX POR TU IP
-                .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
-                .build()
+            RetrofitClient.getApiService().registrarUsuario(request).enqueue(
+                object : retrofit2.Callback<ApiResponse> {
+                    override fun onResponse(
+                        call: retrofit2.Call<ApiResponse>,
+                        response: retrofit2.Response<ApiResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            val mensajeServidor = response.body()?.message ?: "Usuario registrado"
 
-            val apiService = retrofit.create(ApiService::class.java)
+                            tvStatus.text = "Estado: $mensajeServidor"
+                            sessionManager.setUbicacionRegistrada(true)
+                            sessionManager.guardarCoordenadas(lat, lon)
+                            Toast.makeText(this@MainActivity, "Exito: $mensajeServidor", Toast.LENGTH_LONG).show()
 
-            // 5. Hacemos la llamada
-            apiService.registrarUsuario(request).enqueue(object : retrofit2.Callback<ApiResponse> {
-                override fun onResponse(call: retrofit2.Call<ApiResponse>, response: retrofit2.Response<ApiResponse>) {
-                    if (response.isSuccessful) {
-                        // Accedemos al campo 'message' del objeto que viene del servidor
-                        val mensajeServidor = response.body()?.message ?: "Usuario registrado"
+                            startActivity(Intent(this@MainActivity, MapaActivity::class.java))
+                            finish()
+                        } else {
+                            tvStatus.text = "Error del servidor: ${response.code()}"
+                        }
+                    }
 
-                        tvStatus.text = "Estado: $mensajeServidor"
-                        Toast.makeText(this@MainActivity, "Éxito: $mensajeServidor", Toast.LENGTH_LONG).show()
-                    } else {
-                        tvStatus.text = "Error del servidor: ${response.code()}"
+                    override fun onFailure(call: retrofit2.Call<ApiResponse>, t: Throwable) {
+                        tvStatus.text = "Fallo de red: ${t.message}"
+                        Log.e("API_ERROR", "Error de conexion", t)
                     }
                 }
-
-                override fun onFailure(call: retrofit2.Call<ApiResponse>, t: Throwable) {
-                    tvStatus.text = "Fallo de red: ${t.message}"
-                    Log.e("API_ERROR", "Error de conexión", t)
-                }
-            })
+            )
         }
     }
-
 }

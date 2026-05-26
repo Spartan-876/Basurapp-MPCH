@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">RecolectorAPP</string>
+    <string name="titulo_alerta">Alerta Camion Basura</string>
+    <string name="subtitulo_ciudad">Chiclayo - Peru</string>
+    <string name="mensaje_ubicacion">Presiona el boton para registrar tu ubicacion actual.\nAsegurate de estar en tu hogar o en el punto\ndonde deseas recibir la alerta del camion recolector.</string>
+    <string name="hint_nombre">Tu nombre completo</string>
+    <string name="hint_telefono">Telefono del familiar (para SMS)</string>
+    <string name="btn_registrar">Guardar ubicacion y registrarse</string>
+    <string name="status_pendiente">Estado: Pendiente</string>
 </resources>

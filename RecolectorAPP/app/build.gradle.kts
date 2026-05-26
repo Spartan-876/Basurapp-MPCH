@@ -3,6 +3,15 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+import java.util.Properties
+import java.io.FileInputStream
+
+val secretsFile = rootProject.file("secrets.properties")
+val secrets = Properties().apply {
+    if (secretsFile.exists()) load(FileInputStream(secretsFile))
+    else setProperty("BASE_URL", "http://10.0.2.2:8080/")
+}
+
 android {
     namespace = "com.utp.basurapp.recolectorapp"
     compileSdk {
@@ -19,6 +28,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "BASE_URL", "\"${secrets.getProperty("BASE_URL")}\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -45,15 +60,19 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
     implementation("com.google.firebase:firebase-messaging-ktx")
 
-    // Google Maps y Ubicación
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    // Ubicacion
     implementation("com.google.android.gms:play-services-location:21.1.0")
+
+    // MapLibre
+    implementation("org.maplibre.gl:android-sdk:11.11.0")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 }

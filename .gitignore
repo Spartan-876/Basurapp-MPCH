@@ -32,3 +32,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Entorno ###
+.env
+**/.env
+
+### Agente ###
+AGENTS.md
+.agents
+**/skills-lock.json
+opencode.json
