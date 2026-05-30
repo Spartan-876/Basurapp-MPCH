@@ -3,7 +3,6 @@ package com.utp.basurapp.recolectorapp
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
@@ -32,6 +31,7 @@ class LoginActivity : AppCompatActivity() {
         val btnLogin = findViewById<MaterialButton>(R.id.btnLogin)
         val tvError = findViewById<TextView>(R.id.tvLoginError)
         val tvGoToRegister = findViewById<TextView>(R.id.tvGoToRegister)
+        val tvForgotPassword = findViewById<TextView>(R.id.tvForgotPassword)
 
         btnLogin.setOnClickListener {
             val email = etEmail.text.toString().trim()
@@ -67,7 +67,7 @@ class LoginActivity : AppCompatActivity() {
                                 tvError.visibility = TextView.VISIBLE
                             }
                         } else {
-                            tvError.text = "Credenciales invalidas"
+                            tvError.text = "Credenciales inválidas"
                             tvError.visibility = TextView.VISIBLE
                         }
                     }
@@ -77,7 +77,7 @@ class LoginActivity : AppCompatActivity() {
                         t: Throwable
                     ) {
                         btnLogin.isEnabled = true
-                        tvError.text = "Error de conexion: ${t.message}"
+                        tvError.text = "Error de conexión: ${t.message}"
                         tvError.visibility = TextView.VISIBLE
                     }
                 })
@@ -86,13 +86,18 @@ class LoginActivity : AppCompatActivity() {
         tvGoToRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
+
+        tvForgotPassword.setOnClickListener {
+            tvError.text = "Funcionalidad próximamente"
+            tvError.visibility = TextView.VISIBLE
+        }
     }
 
     private fun irALaPantallaCorrespondiente() {
         val destino = if (sessionManager.isUbicacionRegistrada()) {
-            Intent(this, MapaActivity::class.java)
-        } else {
             Intent(this, MainActivity::class.java)
+        } else {
+            Intent(this, RegisterActivity::class.java)
         }
         startActivity(destino)
         finish()

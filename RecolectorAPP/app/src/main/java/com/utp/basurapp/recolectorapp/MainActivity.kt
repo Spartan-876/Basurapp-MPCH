@@ -1,137 +1,78 @@
 package com.utp.basurapp.recolectorapp
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.google.firebase.messaging.FirebaseMessaging
-import com.utp.basurapp.recolectorapp.api.RetrofitClient
-import com.utp.basurapp.recolectorapp.data.ApiResponse
-import com.utp.basurapp.recolectorapp.data.UsuarioRequest
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.utp.basurapp.recolectorapp.util.SessionManager
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var fusedLocationClient: com.google.android.gms.location.FusedLocationProviderClient
     private lateinit var sessionManager: SessionManager
+    private lateinit var bottomNav: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
         sessionManager = SessionManager(this)
+        bottomNav = findViewById(R.id.bottom_nav)
 
-        val nombre = sessionManager.getNombre() ?: ""
+        pedirPermisosUbicacion()
 
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                println("Error obteniendo el token de Firebase")
-                return@addOnCompleteListener
-            }
-            val token = task.result
-            println("Mi Token de Firebase es: $token")
+        if (savedInstanceState == null) {
+            cargarFragmento(HomeFragment())
+            bottomNav.selectedItemId = R.id.nav_home
         }
 
-        fusedLocationClient = com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(this)
-
-        val etNombre = findViewById<EditText>(R.id.etNombre)
-        if (nombre.isNotEmpty()) etNombre.setText(nombre)
-
-        val btnRegistrar = findViewById<Button>(R.id.btnRegistrar)
-        btnRegistrar.setOnClickListener {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                    if (location != null) {
-                        registrarEnBackend(location.latitude, location.longitude)
-                    } else {
-                        Toast.makeText(this, "No se pudo obtener ubicacion. Activa el GPS", Toast.LENGTH_SHORT).show()
-                    }
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    cargarFragmento(HomeFragment())
+                    true
                 }
-            } else {
-                pedirPermisosApp()
+                R.id.nav_history -> {
+                    cargarFragmento(HistorialFragment())
+                    true
+                }
+                R.id.nav_report -> {
+                    cargarFragmento(ReportarFragment())
+                    true
+                }
+                R.id.nav_settings -> {
+                    cargarFragmento(AjustesFragment())
+                    true
+                }
+                else -> false
             }
         }
-
-        pedirPermisosApp()
     }
 
-    private fun pedirPermisosApp() {
-        val listaPermisos = mutableListOf(
+    private fun cargarFragmento(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
+    }
+
+    private fun pedirPermisosUbicacion() {
+        val permisos = mutableListOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.SEND_SMS
         )
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            listaPermisos.add(Manifest.permission.POST_NOTIFICATIONS)
+            permisos.add(Manifest.permission.POST_NOTIFICATIONS)
         }
-
-        ActivityCompat.requestPermissions(
-            this,
-            listaPermisos.toTypedArray(),
-            100
-        )
-    }
-
-    private fun registrarEnBackend(lat: Double, lon: Double) {
-        val nombre = findViewById<EditText>(R.id.etNombre).text.toString()
-        val telefono = findViewById<EditText>(R.id.etTelefonoFamiliar).text.toString()
-        val tvStatus = findViewById<TextView>(R.id.tvStatus)
-
-        FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
-            val request = UsuarioRequest(
-                nombre = nombre,
-                email = sessionManager.getEmail(),
-                fcmToken = token,
-                telefonoFamiliar = telefono,
-                latitud = lat,
-                longitud = lon
-            )
-
-            RetrofitClient.getApiService().registrarUsuario(request).enqueue(
-                object : retrofit2.Callback<ApiResponse> {
-                    override fun onResponse(
-                        call: retrofit2.Call<ApiResponse>,
-                        response: retrofit2.Response<ApiResponse>
-                    ) {
-                        if (response.isSuccessful) {
-                            val mensajeServidor = response.body()?.message ?: "Usuario registrado"
-
-                            tvStatus.text = "Estado: $mensajeServidor"
-                            sessionManager.setUbicacionRegistrada(true)
-                            sessionManager.guardarCoordenadas(lat, lon)
-                            Toast.makeText(this@MainActivity, "Exito: $mensajeServidor", Toast.LENGTH_LONG).show()
-
-                            startActivity(Intent(this@MainActivity, MapaActivity::class.java))
-                            finish()
-                        } else {
-                            tvStatus.text = "Error del servidor: ${response.code()}"
-                        }
-                    }
-
-                    override fun onFailure(call: retrofit2.Call<ApiResponse>, t: Throwable) {
-                        tvStatus.text = "Fallo de red: ${t.message}"
-                        Log.e("API_ERROR", "Error de conexion", t)
-                    }
-                }
-            )
+        val faltantes = permisos.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+        if (faltantes.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, faltantes.toTypedArray(), 100)
         }
     }
 }

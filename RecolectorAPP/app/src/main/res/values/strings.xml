@@ -1,10 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RecolectorAPP</string>
-    <string name="titulo_alerta">Alerta Camion Basura</string>
-    <string name="subtitulo_ciudad">Chiclayo - Peru</string>
-    <string name="mensaje_ubicacion">Presiona el boton para registrar tu ubicacion actual.\nAsegurate de estar en tu hogar o en el punto\ndonde deseas recibir la alerta del camion recolector.</string>
-    <string name="hint_nombre">Tu nombre completo</string>
-    <string name="hint_telefono">Telefono del familiar (para SMS)</string>
-    <string name="btn_registrar">Guardar ubicacion y registrarse</string>
-    <string name="status_pendiente">Estado: Pendiente</string>
+    <string name="app_name">Basurapp</string>
+    <string name="app_tagline">Gestión cívica inteligente</string>
+    <string name="app_tagline_sub">Conectando comunidades para un entorno más limpio</string>
+    <string name="app_tagline_login">Gestión cívica para una ciudad más limpia</string>
+
+    <string name="title_login">Iniciar Sesión</string>
+    <string name="btn_login">Acceder a mi cuenta</string>
+    <string name="btn_register">Crear cuenta</string>
+    <string name="btn_send_report">Enviar reporte</string>
+    <string name="btn_save_changes">Guardar Cambios</string>
+    <string name="hint_email">Correo electrónico</string>
+    <string name="hint_password">Contraseña</string>
+    <string name="hint_name">Nombre completo</string>
+    <string name="hint_confirm_password">Confirmar contraseña</string>
+    <string name="link_forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="link_register">¿No tienes cuenta? Regístrate aquí</string>
+    <string name="link_register_simple">¿No tienes cuenta? Regístrate</string>
+    <string name="link_login">¿Ya tienes cuenta? Inicia sesión</string>
+    <string name="register_title">Crear cuenta</string>
+    <string name="register_subtitle">Únete a Basurapp y mejora tu comunidad.</string>
+    <string name="location_title">¿Qué ubicación deseas registrar?</string>
+    <string name="location_description">Necesitamos tu ubicación principal para mostrarte los servicios de recolección relevantes.</string>
+    <string name="location_gps">Usar ubicación actual (GPS)</string>
+    <string name="location_gps_desc">Rápido y preciso si estás en casa ahora mismo.</string>
+    <string name="location_map">Elegir manualmente en el mapa</string>
+    <string name="location_map_desc">Busca una dirección o mueve el pin en el mapa.</string>
+    <string name="btn_use_gps">Usar ubicación actual</string>
+    <string name="btn_choose_map">Elegir en el mapa</string>
+
+    <string name="home_title">Inicio</string>
+    <string name="history_title">Historial de Alertas</string>
+    <string name="report_title">Nuevo Reporte</string>
+    <string name="settings_title">Configuración</string>
+    <string name="alerts_title">Alertas de Proximidad</string>
+
+    <string name="service_normal">Servicio Normal</string>
+    <string name="zone_label">Tu zona: Pimentel</string>
+    <string name="schedule_label">Horario de recolección de la zona</string>
+    <string name="arrival_time">Aprox. en tu domicilio</string>
+    <string name="swipe_up_info">Desliza hacia arriba para más info</string>
+    <string name="on_route">En ruta</string>
+    <string name="nearby">Cercano</string>
+    <string name="share_alert">Compartir alerta</string>
+
+    <string name="tab_home">Inicio</string>
+    <string name="tab_history">Historial</string>
+    <string name="tab_report">Reportar</string>
+    <string name="tab_settings">Ajustes</string>
+
+    <string name="filter_all">Todas</string>
+    <string name="filter_important">Importantes</string>
+    <string name="filter_resolved">Resueltos</string>
+    <string name="today">Hoy</string>
+    <string name="yesterday">Ayer</string>
+    <string name="alert_info">Informativo</string>
+    <string name="alert_important">Importante</string>
+    <string name="alert_resolved">Resuelto</string>
+    <string name="alert_warning">Aviso</string>
+
+    <string name="report_photo_hint">Captura una foto clara de la acumulación de residuos.</string>
+    <string name="report_location_detected">Ubicación detectada</string>
+    <string name="report_details_hint">Detalles adicionales (Opcional)</string>
+
+    <string name="settings_account">Cuenta</string>
+    <string name="settings_notifications">Notificaciones y Alertas</string>
+    <string name="settings_name">Nombre</string>
+    <string name="settings_email">Correo electrónico</string>
+    <string name="settings_password">Contraseña</string>
+    <string name="settings_address">Dirección de recolección principal</string>
+    <string name="settings_vibration">Vibración</string>
+    <string name="settings_vibration_desc">Al aproximarse el camión</string>
+    <string name="settings_sound">Sonido de alerta</string>
+    <string name="settings_sound_default">Predeterminado (Campana)</string>
+    <string name="settings_logout">Cerrar sesión</string>
+
+    <string name="alert_proximity_title">Activar Alertas</string>
+    <string name="alert_proximity_desc">Recibe un aviso en tu dispositivo cuando el camión recolector esté cerca de tu domicilio.</string>
+    <string name="alert_radius">Radio de Alerta</string>
+    <string name="alert_radius_hint">Te notificaremos aproximadamente 5 minutos antes de que el camión llegue a tu zona con un radio de 500m.</string>
+    <string name="alert_days">Días de Recolección</string>
+    <string name="alert_days_hint">Selecciona los días que deseas recibir avisos basados en tu ruta.</string>
+    <string name="alert_sound">Sonido de Notificación</string>
+    <string name="alert_vibration">Vibración</string>
+    <string name="distance_unit">m</string>
+    <string name="distance_100">100m</string>
+    <string name="distance_2km">2km</string>
+
+    <string name="mon">L</string>
+    <string name="tue">M</string>
+    <string name="wed">M</string>
+    <string name="thu">J</string>
+    <string name="fri">V</string>
+    <string name="sat">S</string>
+    <string name="sun">D</string>
+
+    <string name="estado_pendiente">Estado: Pendiente</string>
+    <string name="mensaje_whatsapp">El camión recolector está cerca. Saca la basura de tu casa.</string>
+    <string name="whatsapp_not_installed">WhatsApp no está instalado</string>
+    <string name="sms_not_available">No se puede enviar SMS</string>
+    <string name="gps_required">Activa el GPS para usar esta función</string>
+    <string name="error_network">Error de conexión</string>
+    <string name="error_server">Error del servidor</string>
 </resources>

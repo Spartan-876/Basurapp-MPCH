@@ -4,18 +4,35 @@
         <item name="colorOnPrimary">@color/onPrimary</item>
         <item name="colorPrimaryContainer">@color/primaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/onPrimaryContainer</item>
+        <item name="colorPrimaryFixed">@color/primaryFixed</item>
+        <item name="colorPrimaryFixedDim">@color/primaryFixedDim</item>
+        <item name="colorOnPrimaryFixed">@color/onPrimaryFixed</item>
+        <item name="colorOnPrimaryFixedVariant">@color/onPrimaryFixedVariant</item>
         <item name="colorSecondary">@color/secondary</item>
-        <item name="colorSecondaryContainer">@color/secondaryContainer</item>
         <item name="colorOnSecondary">@color/onSecondary</item>
+        <item name="colorSecondaryContainer">@color/secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/onSecondaryContainer</item>
+        <item name="colorSecondaryFixed">@color/secondaryFixed</item>
+        <item name="colorSecondaryFixedDim">@color/secondaryFixedDim</item>
+        <item name="colorOnSecondaryFixed">@color/onSecondaryFixed</item>
+        <item name="colorOnSecondaryFixedVariant">@color/onSecondaryFixedVariant</item>
+        <item name="colorTertiary">@color/tertiary</item>
+        <item name="colorOnTertiary">@color/onTertiary</item>
+        <item name="colorTertiaryContainer">@color/tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/onTertiaryContainer</item>
         <item name="colorSurface">@color/surface</item>
         <item name="colorOnSurface">@color/onSurface</item>
         <item name="colorSurfaceVariant">@color/surfaceVariant</item>
         <item name="colorOnSurfaceVariant">@color/onSurfaceVariant</item>
         <item name="colorOutline">@color/outline</item>
+        <item name="colorOutlineVariant">@color/outlineVariant</item>
         <item name="android:colorBackground">@color/background</item>
         <item name="colorOnBackground">@color/onBackground</item>
         <item name="colorError">@color/error</item>
         <item name="colorOnError">@color/onError</item>
+        <item name="colorErrorContainer">@color/errorContainer</item>
+        <item name="colorOnErrorContainer">@color/onErrorContainer</item>
+
     </style>
 
     <style name="Theme.RecolectorAPP" parent="Base.Theme.RecolectorAPP" />

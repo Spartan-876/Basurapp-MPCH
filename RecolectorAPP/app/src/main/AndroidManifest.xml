@@ -43,6 +43,10 @@
             android:name=".MapaActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".AlertasConfigActivity"
+            android:exported="false" />
+
         <service
             android:name=".MyFirebaseMessagingService"
             android:exported="false">

@@ -3,26 +3,60 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="primary">#FF2E7D32</color>
-    <color name="primaryDark">#FF1B5E20</color>
-    <color name="primaryLight">#FFA5D6A7</color>
+    <color name="primary">#FF0D631B</color>
+    <color name="primaryDark">#FF0D631B</color>
+    <color name="primaryLight">#FF88D982</color>
     <color name="onPrimary">#FFFFFFFF</color>
-    <color name="primaryContainer">#FFC8E6C9</color>
-    <color name="onPrimaryContainer">#FF0D3310</color>
+    <color name="primaryContainer">#FF2E7D32</color>
+    <color name="onPrimaryContainer">#FFCBFFC2</color>
+    <color name="primaryFixed">#FFA3F69C</color>
+    <color name="primaryFixedDim">#FF88D982</color>
+    <color name="onPrimaryFixed">#FF002204</color>
+    <color name="onPrimaryFixedVariant">#FF005312</color>
 
-    <color name="secondary">#FF558B2F</color>
-    <color name="secondaryContainer">#FFDCEDC8</color>
+    <color name="secondary">#FF3E6A00</color>
     <color name="onSecondary">#FFFFFFFF</color>
+    <color name="secondaryContainer">#FFB9F474</color>
+    <color name="onSecondaryContainer">#FF437000</color>
+    <color name="secondaryFixed">#FFB9F474</color>
+    <color name="secondaryFixedDim">#FF9ED75B</color>
+    <color name="onSecondaryFixed">#FF0F2000</color>
+    <color name="onSecondaryFixedVariant">#FF2E4F00</color>
 
-    <color name="surface">#FFF5F5F5</color>
+    <color name="tertiary">#FF4D5950</color>
+    <color name="onTertiary">#FFFFFFFF</color>
+    <color name="tertiaryContainer">#FF657167</color>
+    <color name="onTertiaryContainer">#FFE8F5E9</color>
+    <color name="tertiaryFixed">#FFD9E6DA</color>
+    <color name="tertiaryFixedDim">#FFBDCABE</color>
+    <color name="onTertiaryFixed">#FF131E17</color>
+    <color name="onTertiaryFixedVariant">#FF3E4A41</color>
+
+    <color name="surface">#FFFDF8FD</color>
     <color name="onSurface">#FF1C1B1F</color>
-    <color name="surfaceVariant">#FFE0E0E0</color>
-    <color name="onSurfaceVariant">#FF49454F</color>
+    <color name="surfaceVariant">#FFE5E1E7</color>
+    <color name="onSurfaceVariant">#FF40493D</color>
+    <color name="surfaceDim">#FFDDD9DE</color>
+    <color name="surfaceBright">#FFFDF8FD</color>
+    <color name="surfaceContainerLowest">#FFFFFFFF</color>
+    <color name="surfaceContainerLow">#FFF7F2F8</color>
+    <color name="surfaceContainer">#FFF1ECF2</color>
+    <color name="surfaceContainerHigh">#FFEBE7EC</color>
+    <color name="surfaceContainerHighest">#FFE5E1E7</color>
 
-    <color name="outline">#FF79747E</color>
-    <color name="background">#FFFFFFFF</color>
+    <color name="outline">#FF707A6C</color>
+    <color name="outlineVariant">#FFBFCABA</color>
+    <color name="background">#FFFDF8FD</color>
     <color name="onBackground">#FF1C1B1F</color>
 
-    <color name="error">#FFB3261E</color>
+    <color name="error">#FFBA1A1A</color>
     <color name="onError">#FFFFFFFF</color>
+    <color name="errorContainer">#FFFFDAD6</color>
+    <color name="onErrorContainer">#FF93000A</color>
+
+    <color name="inverseSurface">#FF313034</color>
+    <color name="inverseOnSurface">#FFF4EFF5</color>
+    <color name="inversePrimary">#FF88D982</color>
+
+    <color name="surfaceTint">#FF1B6D24</color>
 </resources>
