@@ -18,7 +18,7 @@
             android:layout_height="80dp"
             android:layout_marginTop="32dp"
             android:layout_marginBottom="12dp"
-            android:src="@drawable/ic_camion_recolector"
+            android:src="@drawable/ic_logo_stitch"
             android:contentDescription="@string/app_name" />
 
         <TextView
