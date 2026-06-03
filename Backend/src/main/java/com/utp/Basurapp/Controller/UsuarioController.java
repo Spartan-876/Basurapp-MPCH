@@ -9,6 +9,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,9 +26,9 @@ public class UsuarioController {
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
     public UsuarioController(UsuarioRepository usuarioRepository,
-                             AlertaService alertaService,
-                             CamionUbicacionStore camionUbicacionStore,
-                             PasswordEncoder passwordEncoder) {
+            AlertaService alertaService,
+            CamionUbicacionStore camionUbicacionStore,
+            PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.alertaService = alertaService;
         this.camionUbicacionStore = camionUbicacionStore;
@@ -59,6 +60,21 @@ public class UsuarioController {
 
         usuarioRepository.save(usuario);
         return ResponseEntity.ok(Map.of("message", "Usuario registrado con exito"));
+    }
+
+    @PutMapping("/fcm-token")
+    public ResponseEntity<?> actualizarFcmToken(@RequestBody Map<String, String> body, Authentication auth) {
+        String email = auth.getName();
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        String fcmToken = body.get("fcmToken");
+        if (fcmToken != null) {
+            usuario.setFcmToken(fcmToken);
+            usuarioRepository.save(usuario);
+        }
+
+        return ResponseEntity.ok(Map.of("message", "Token actualizado"));
     }
 
     @GetMapping("/prueba-camion")

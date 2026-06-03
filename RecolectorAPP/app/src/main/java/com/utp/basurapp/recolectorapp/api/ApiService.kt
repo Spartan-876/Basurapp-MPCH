@@ -5,6 +5,7 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 
 interface ApiService {
     @POST("api/usuarios/registrar")
@@ -15,6 +16,9 @@ interface ApiService {
 
     @POST("api/auth/registrar")
     fun register(@Body request: RegisterRequest): Call<AuthResponse>
+
+    @PUT("api/usuarios/fcm-token")
+    fun actualizarFcmToken(@Body request: FcmTokenRequest): Call<ApiResponse>
 
     @GET("api/camion/ubicacion")
     fun getCamionUbicacion(): Call<CamionResponse>

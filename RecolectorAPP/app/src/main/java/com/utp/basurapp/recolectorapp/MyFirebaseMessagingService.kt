@@ -7,17 +7,39 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.utp.basurapp.recolectorapp.api.RetrofitClient
+import com.utp.basurapp.recolectorapp.data.ApiResponse
+import com.utp.basurapp.recolectorapp.data.FcmTokenRequest
+import com.utp.basurapp.recolectorapp.util.SessionManager
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+        val prefs = getSharedPreferences("basurapp_session", Context.MODE_PRIVATE)
+        prefs.edit().putString("fcm_token", token).apply()
+
+        val sessionToken = prefs.getString("token", null) ?: return
+        val sessionManager = SessionManager(applicationContext)
+        RetrofitClient.init(sessionManager)
+        RetrofitClient.getApiService().actualizarFcmToken(FcmTokenRequest(token))
+            .enqueue(object : retrofit2.Callback<ApiResponse> {
+                override fun onResponse(
+                    call: retrofit2.Call<ApiResponse>,
+                    response: retrofit2.Response<ApiResponse>
+                ) {}
+
+                override fun onFailure(
+                    call: retrofit2.Call<ApiResponse>,
+                    t: Throwable
+                ) {}
+            })
+    }
+
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        // 1. Mostrar la notificación en el celular
         val titulo = remoteMessage.notification?.title ?: "¡Camión cerca!"
         val mensaje = remoteMessage.notification?.body ?: "El recolector está por tu casa."
         mostrarNotificacion(titulo, mensaje)
-
-        // 2. LOGICA DEL SMS (Opcional por ahora)
-        // Aquí podrías disparar el SMS automáticamente si guardaste el número en SharedPreferences
     }
 
     private fun mostrarNotificacion(title: String, message: String) {

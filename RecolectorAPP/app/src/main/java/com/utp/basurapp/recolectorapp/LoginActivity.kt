@@ -6,7 +6,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.messaging.FirebaseMessaging
 import com.utp.basurapp.recolectorapp.api.RetrofitClient
+import com.utp.basurapp.recolectorapp.data.FcmTokenRequest
 import com.utp.basurapp.recolectorapp.data.LoginRequest
 import com.utp.basurapp.recolectorapp.util.SessionManager
 
@@ -20,6 +22,12 @@ class LoginActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
         RetrofitClient.init(sessionManager)
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                sessionManager.guardarFcmToken(task.result)
+            }
+        }
 
         if (sessionManager.isLoggedIn()) {
             irALaPantallaCorrespondiente()
@@ -46,7 +54,7 @@ class LoginActivity : AppCompatActivity() {
             tvError.visibility = TextView.GONE
             btnLogin.isEnabled = false
 
-            RetrofitClient.getApiService().login(LoginRequest(email, password))
+            RetrofitClient.getApiService().login(LoginRequest(email, password, sessionManager.getFcmToken()))
                 .enqueue(object : retrofit2.Callback<com.utp.basurapp.recolectorapp.data.AuthResponse> {
                     override fun onResponse(
                         call: retrofit2.Call<com.utp.basurapp.recolectorapp.data.AuthResponse>,
@@ -61,6 +69,20 @@ class LoginActivity : AppCompatActivity() {
                                     body.email ?: email,
                                     body.nombre ?: ""
                                 )
+                                sessionManager.setUbicacionRegistrada(true)
+                                sessionManager.getFcmToken()?.let { token ->
+                                    RetrofitClient.getApiService().actualizarFcmToken(FcmTokenRequest(token))
+                                        .enqueue(object : retrofit2.Callback<com.utp.basurapp.recolectorapp.data.ApiResponse> {
+                                            override fun onResponse(
+                                                call: retrofit2.Call<com.utp.basurapp.recolectorapp.data.ApiResponse>,
+                                                response: retrofit2.Response<com.utp.basurapp.recolectorapp.data.ApiResponse>
+                                            ) {}
+                                            override fun onFailure(
+                                                call: retrofit2.Call<com.utp.basurapp.recolectorapp.data.ApiResponse>,
+                                                t: Throwable
+                                            ) {}
+                                        })
+                                }
                                 irALaPantallaCorrespondiente()
                             } else {
                                 tvError.text = "Error del servidor"

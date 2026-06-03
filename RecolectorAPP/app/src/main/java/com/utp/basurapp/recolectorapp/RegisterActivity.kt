@@ -85,7 +85,7 @@ class RegisterActivity : AppCompatActivity() {
             tvError.visibility = TextView.GONE
             btnRegister.isEnabled = false
 
-            RetrofitClient.getApiService().register(RegisterRequest(email, password, nombre))
+            RetrofitClient.getApiService().register(RegisterRequest(email, password, nombre, sessionManager.getFcmToken()))
                 .enqueue(object : retrofit2.Callback<com.utp.basurapp.recolectorapp.data.AuthResponse> {
                     override fun onResponse(
                         call: retrofit2.Call<com.utp.basurapp.recolectorapp.data.AuthResponse>,

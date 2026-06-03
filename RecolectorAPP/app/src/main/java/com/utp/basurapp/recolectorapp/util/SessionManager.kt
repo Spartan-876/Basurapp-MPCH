@@ -13,6 +13,7 @@ class SessionManager(context: Context) {
         private const val KEY_EMAIL = "email"
         private const val KEY_NOMBRE = "nombre"
         private const val KEY_UBICACION_REGISTRADA = "ubicacion_registrada"
+        private const val KEY_FCM_TOKEN = "fcm_token"
         private const val KEY_LATITUD = "latitud"
         private const val KEY_LONGITUD = "longitud"
     }
@@ -33,6 +34,12 @@ class SessionManager(context: Context) {
     fun getNombre(): String? = prefs.getString(KEY_NOMBRE, null)
 
     fun isLoggedIn(): Boolean = getToken() != null
+
+    fun guardarFcmToken(token: String) {
+        prefs.edit().putString(KEY_FCM_TOKEN, token).apply()
+    }
+
+    fun getFcmToken(): String? = prefs.getString(KEY_FCM_TOKEN, null)
 
     fun isUbicacionRegistrada(): Boolean =
         prefs.getBoolean(KEY_UBICACION_REGISTRADA, false)

@@ -18,8 +18,8 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     public AuthController(UsuarioRepository usuarioRepository,
-                          PasswordEncoder passwordEncoder,
-                          JwtUtil jwtUtil) {
+            PasswordEncoder passwordEncoder,
+            JwtUtil jwtUtil) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
@@ -43,6 +43,10 @@ public class AuthController {
         usuario.setEmail(email);
         usuario.setPassword(passwordEncoder.encode(password));
         usuario.setNombre(nombre);
+
+        if (body.containsKey("fcmToken") && body.get("fcmToken") != null && !body.get("fcmToken").isEmpty()) {
+            usuario.setFcmToken(body.get("fcmToken"));
+        }
 
         usuarioRepository.save(usuario);
 
@@ -69,12 +73,16 @@ public class AuthController {
             return ResponseEntity.status(401).body(Map.of("error", "Credenciales invalidas"));
         }
 
+        if (body.containsKey("fcmToken") && body.get("fcmToken") != null && !body.get("fcmToken").isEmpty()) {
+            usuario.setFcmToken(body.get("fcmToken"));
+            usuarioRepository.save(usuario);
+        }
+
         String token = jwtUtil.generarToken(email);
 
         return ResponseEntity.ok(Map.of(
                 "token", token,
                 "email", email,
-                "nombre", usuario.getNombre()
-        ));
+                "nombre", usuario.getNombre()));
     }
 }
