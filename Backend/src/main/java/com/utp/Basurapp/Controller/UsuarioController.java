@@ -2,8 +2,11 @@ package com.utp.Basurapp.Controller;
 
 import com.utp.Basurapp.Config.CamionUbicacionStore;
 import com.utp.Basurapp.Service.AlertaService;
+import com.utp.Basurapp.dto.FamiliarDTO;
 import com.utp.Basurapp.dto.UsuarioDTO;
+import com.utp.Basurapp.Model.Familiar;
 import com.utp.Basurapp.Model.Usuario;
+import com.utp.Basurapp.Repository.FamiliarRepository;
 import com.utp.Basurapp.Repository.UsuarioRepository;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -13,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -20,16 +24,19 @@ import java.util.Map;
 public class UsuarioController {
 
     private final UsuarioRepository usuarioRepository;
+    private final FamiliarRepository familiarRepository;
     private final AlertaService alertaService;
     private final CamionUbicacionStore camionUbicacionStore;
     private final PasswordEncoder passwordEncoder;
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
     public UsuarioController(UsuarioRepository usuarioRepository,
+            FamiliarRepository familiarRepository,
             AlertaService alertaService,
             CamionUbicacionStore camionUbicacionStore,
             PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.familiarRepository = familiarRepository;
         this.alertaService = alertaService;
         this.camionUbicacionStore = camionUbicacionStore;
         this.passwordEncoder = passwordEncoder;
@@ -52,7 +59,6 @@ public class UsuarioController {
         }
 
         usuario.setFcmToken(dto.getFcmToken());
-        usuario.setTelefonoFamiliar(dto.getTelefonoFamiliar());
 
         Point punto = geometryFactory.createPoint(new Coordinate(dto.getLongitud(), dto.getLatitud()));
         punto.setSRID(4326);
@@ -75,6 +81,97 @@ public class UsuarioController {
         }
 
         return ResponseEntity.ok(Map.of("message", "Token actualizado"));
+    }
+
+    @GetMapping("/familiares")
+    public ResponseEntity<?> listarFamiliares(Authentication auth) {
+        String email = auth.getName();
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        List<Familiar> familiares = familiarRepository.findByUsuarioIdOrderByNombreAsc(usuario.getId());
+        List<FamiliarDTO> dtos = familiares.stream().map(f -> {
+            FamiliarDTO dto = new FamiliarDTO();
+            dto.setId(f.getId());
+            dto.setNombre(f.getNombre());
+            dto.setTelefono(f.getTelefono());
+            return dto;
+        }).toList();
+
+        return ResponseEntity.ok(dtos);
+    }
+
+    @PostMapping("/familiares")
+    public ResponseEntity<?> agregarFamiliar(@RequestBody FamiliarDTO body, Authentication auth) {
+        String email = auth.getName();
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (body.getNombre() == null || body.getNombre().isEmpty() ||
+                body.getTelefono() == null || body.getTelefono().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "nombre y telefono son obligatorios"));
+        }
+
+        Familiar familiar = new Familiar();
+        familiar.setUsuario(usuario);
+        familiar.setNombre(body.getNombre().trim());
+        familiar.setTelefono(body.getTelefono().trim());
+
+        familiarRepository.save(familiar);
+
+        FamiliarDTO dto = new FamiliarDTO();
+        dto.setId(familiar.getId());
+        dto.setNombre(familiar.getNombre());
+        dto.setTelefono(familiar.getTelefono());
+
+        return ResponseEntity.ok(dto);
+    }
+
+    @PutMapping("/familiares/{id}")
+    public ResponseEntity<?> actualizarFamiliar(@PathVariable Long id, @RequestBody FamiliarDTO body, Authentication auth) {
+        String email = auth.getName();
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Familiar familiar = familiarRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Familiar no encontrado"));
+
+        if (!familiar.getUsuario().getId().equals(usuario.getId())) {
+            return ResponseEntity.status(403).body(Map.of("error", "No tienes permiso para modificar este familiar"));
+        }
+
+        if (body.getNombre() != null && !body.getNombre().isEmpty()) {
+            familiar.setNombre(body.getNombre().trim());
+        }
+        if (body.getTelefono() != null && !body.getTelefono().isEmpty()) {
+            familiar.setTelefono(body.getTelefono().trim());
+        }
+
+        familiarRepository.save(familiar);
+
+        FamiliarDTO dto = new FamiliarDTO();
+        dto.setId(familiar.getId());
+        dto.setNombre(familiar.getNombre());
+        dto.setTelefono(familiar.getTelefono());
+
+        return ResponseEntity.ok(dto);
+    }
+
+    @DeleteMapping("/familiares/{id}")
+    public ResponseEntity<?> eliminarFamiliar(@PathVariable Long id, Authentication auth) {
+        String email = auth.getName();
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Familiar familiar = familiarRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Familiar no encontrado"));
+
+        if (!familiar.getUsuario().getId().equals(usuario.getId())) {
+            return ResponseEntity.status(403).body(Map.of("error", "No tienes permiso para eliminar este familiar"));
+        }
+
+        familiarRepository.delete(familiar);
+        return ResponseEntity.ok(Map.of("message", "Familiar eliminado con exito"));
     }
 
     @GetMapping("/prueba-camion")

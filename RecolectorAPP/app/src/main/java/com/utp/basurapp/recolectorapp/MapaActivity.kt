@@ -1,9 +1,7 @@
 package com.utp.basurapp.recolectorapp
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.appbar.MaterialToolbar
@@ -124,24 +122,10 @@ class MapaActivity : AppCompatActivity() {
     }
 
     private fun enviarWhatsApp() {
-        val telefono = "51" // se completaria con el telefono del familiar
-        val mensaje = "El camion recolector esta cerca. Saca la basura de tu casa."
-        val uri = "https://api.whatsapp.com/send?phone=$telefono&text=${Uri.encode(mensaje)}"
-        try {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)))
-        } catch (e: Exception) {
-            Toast.makeText(this, "WhatsApp no esta instalado", Toast.LENGTH_SHORT).show()
-        }
+        startActivity(Intent(this, CompartirAlertaActivity::class.java))
     }
 
     private fun enviarSMS() {
-        val telefono = "51" // se completaria con el telefono del familiar
-        val mensaje = "El camion recolector esta cerca. Saca la basura de tu casa."
-        val uri = "sms:$telefono?body=${Uri.encode(mensaje)}"
-        try {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)))
-        } catch (e: Exception) {
-            Toast.makeText(this, "No se puede enviar SMS", Toast.LENGTH_SHORT).show()
-        }
+        startActivity(Intent(this, CompartirAlertaActivity::class.java))
     }
 }

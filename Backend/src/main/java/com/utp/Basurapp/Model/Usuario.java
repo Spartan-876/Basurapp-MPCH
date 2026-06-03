@@ -24,8 +24,6 @@ public class Usuario {
 
     private String fcmToken;
 
-    private String telefonoFamiliar;
-
     @Column(columnDefinition = "geometry(Point, 4326)")
     private Point ubicacionCasa;
 

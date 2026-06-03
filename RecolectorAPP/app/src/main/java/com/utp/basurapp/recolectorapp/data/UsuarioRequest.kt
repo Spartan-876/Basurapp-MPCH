@@ -5,7 +5,6 @@ data class UsuarioRequest(
     val email: String? = null,
     val password: String? = null,
     val fcmToken: String,
-    val telefonoFamiliar: String,
     val latitud: Double,
     val longitud: Double
 )

@@ -99,7 +99,33 @@
     <string name="mensaje_whatsapp">El camión recolector está cerca. Saca la basura de tu casa.</string>
     <string name="whatsapp_not_installed">WhatsApp no está instalado</string>
     <string name="sms_not_available">No se puede enviar SMS</string>
+
+    <string name="compartir_alerta_title">Compartir Alerta</string>
+    <string name="compartir_avisar_casa">Avisar a Casa</string>
+    <string name="compartir_avisar_desc">El camión está cerca. Pide ayuda rápidamente.</string>
+    <string name="familiares_registrados">Familiares Registrados</string>
+    <string name="familiar_nuevo">Nuevo</string>
+    <string name="nuevo_familiar_title">Nuevo Familiar</string>
+    <string name="hint_familiar_nombre">Nombre del familiar</string>
+    <string name="hint_familiar_telefono">Teléfono</string>
+    <string name="btn_cancelar">Cancelar</string>
+    <string name="btn_guardar">Guardar</string>
+    <string name="btn_eliminar">Eliminar</string>
+    <string name="enviar_por">Enviar por</string>
+    <string name="enviar_alerta">Enviar alerta</string>
+    <string name="sin_familiares">No tienes familiares registrados. Agrega uno para enviar alertas.</string>
+    <string name="familiar_guardado">Familiar guardado correctamente</string>
+    <string name="familiar_eliminado">Familiar eliminado correctamente</string>
+    <string name="error_cargar_familiares">Error al cargar familiares</string>
+    <string name="confirmar_eliminar">¿Eliminar a %s de tus familiares?</string>
     <string name="gps_required">Activa el GPS para usar esta función</string>
     <string name="error_network">Error de conexión</string>
     <string name="error_server">Error del servidor</string>
+
+    <string name="map_selector_title">Seleccionar ubicación</string>
+    <string name="map_selector_confirm">Confirmar ubicación</string>
+    <string name="map_selector_hint">Arrastra el mapa para mover el pin</string>
+    <string name="ubicacion_capturada">Ubicación capturada correctamente</string>
+    <string name="gps_no_disponible">No se pudo obtener la ubicación. Activa el GPS.</string>
+    <string name="gps_error">Error al obtener ubicación</string>
 </resources>

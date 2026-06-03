@@ -3,9 +3,11 @@ package com.utp.basurapp.recolectorapp.api
 import com.utp.basurapp.recolectorapp.data.*
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
 
 interface ApiService {
     @POST("api/usuarios/registrar")
@@ -22,4 +24,16 @@ interface ApiService {
 
     @GET("api/camion/ubicacion")
     fun getCamionUbicacion(): Call<CamionResponse>
+
+    @GET("api/usuarios/familiares")
+    fun listarFamiliares(): Call<List<FamiliarResponse>>
+
+    @POST("api/usuarios/familiares")
+    fun agregarFamiliar(@Body request: FamiliarRequest): Call<FamiliarResponse>
+
+    @PUT("api/usuarios/familiares/{id}")
+    fun actualizarFamiliar(@Path("id") id: Long, @Body request: FamiliarRequest): Call<FamiliarResponse>
+
+    @DELETE("api/usuarios/familiares/{id}")
+    fun eliminarFamiliar(@Path("id") id: Long): Call<ApiResponse>
 }

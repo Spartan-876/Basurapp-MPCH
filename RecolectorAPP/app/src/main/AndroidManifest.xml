@@ -45,6 +45,14 @@
             android:name=".AlertasConfigActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".CompartirAlertaActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SeleccionarUbicacionActivity"
+            android:exported="false" />
+
         <service
             android:name=".MyFirebaseMessagingService"
             android:exported="false">

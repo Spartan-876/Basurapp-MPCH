@@ -122,13 +122,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun compartirAlerta() {
-        val telefono = "51"
-        val mensaje = "El camión recolector está cerca. Saca la basura de tu casa."
-        val uri = "https://api.whatsapp.com/send?phone=$telefono&text=${android.net.Uri.encode(mensaje)}"
-        try {
-            startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(uri)))
-        } catch (e: Exception) {
-            android.widget.Toast.makeText(requireContext(), "WhatsApp no está instalado", android.widget.Toast.LENGTH_SHORT).show()
-        }
+        startActivity(Intent(requireContext(), CompartirAlertaActivity::class.java))
     }
 }

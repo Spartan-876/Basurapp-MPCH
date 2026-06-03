@@ -8,7 +8,6 @@ public class UsuarioDTO {
     private String email;
     private String password;
     private String fcmToken;
-    private String telefonoFamiliar;
     private double latitud;
     private double longitud;
 }

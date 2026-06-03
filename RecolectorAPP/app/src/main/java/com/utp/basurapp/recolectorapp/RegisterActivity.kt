@@ -3,13 +3,16 @@ package com.utp.basurapp.recolectorapp
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-
+import android.location.Location
 import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textfield.TextInputEditText
@@ -20,13 +23,32 @@ import com.utp.basurapp.recolectorapp.util.SessionManager
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
-    private var locationSelectedViaGps: Boolean = false
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    private var selectedLat: Double? = null
+    private var selectedLon: Double? = null
+    private var locationSource: String? = null
+
+    private val mapSelectorLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            selectedLat = result.data?.getDoubleExtra("latitud", 0.0)
+            selectedLon = result.data?.getDoubleExtra("longitud", 0.0)
+            locationSource = "map"
+            val cardMap = findViewById<MaterialCardView>(R.id.cardLocationMap)
+            val cardGps = findViewById<MaterialCardView>(R.id.cardLocationGps)
+            cardMap.strokeColor = ContextCompat.getColor(this, R.color.primary)
+            cardGps.strokeColor = ContextCompat.getColor(this, R.color.outlineVariant)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
         sessionManager = SessionManager(this)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         RetrofitClient.init(sessionManager)
 
         val etNombre = findViewById<TextInputEditText>(R.id.etRegisterNombre)
@@ -39,24 +61,32 @@ class RegisterActivity : AppCompatActivity() {
         val cardMap = findViewById<MaterialCardView>(R.id.cardLocationMap)
 
         cardGps.setOnClickListener {
-            cardGps.strokeColor = ContextCompat.getColor(this, R.color.primary)
-            cardMap.strokeColor = ContextCompat.getColor(this, R.color.outlineVariant)
-            locationSelectedViaGps = true
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(
                     this,
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
                     200
                 )
+                return@setOnClickListener
+            }
+
+            obtenerUbicacionGps { lat, lon ->
+                selectedLat = lat
+                selectedLon = lon
+                locationSource = "gps"
+                cardGps.strokeColor = ContextCompat.getColor(this, R.color.primary)
+                cardMap.strokeColor = ContextCompat.getColor(this, R.color.outlineVariant)
+                Toast.makeText(this, "Ubicación capturada correctamente", Toast.LENGTH_SHORT).show()
             }
         }
 
         cardMap.setOnClickListener {
-            cardMap.strokeColor = ContextCompat.getColor(this, R.color.primary)
-            cardGps.strokeColor = ContextCompat.getColor(this, R.color.outlineVariant)
-            locationSelectedViaGps = false
-            tvError.text = "Selector de mapa próximamente"
-            tvError.visibility = TextView.VISIBLE
+            val intent = Intent(this, SeleccionarUbicacionActivity::class.java)
+            if (selectedLat != null && selectedLon != null) {
+                intent.putExtra("latitud", selectedLat)
+                intent.putExtra("longitud", selectedLon)
+            }
+            mapSelectorLauncher.launch(intent)
         }
 
         btnRegister.setOnClickListener {
@@ -76,8 +106,8 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if (!locationSelectedViaGps) {
-                tvError.text = "Selecciona una ubicación usando GPS"
+            if (selectedLat == null || selectedLon == null) {
+                tvError.text = "Selecciona una ubicación usando GPS o el mapa"
                 tvError.visibility = TextView.VISIBLE
                 return@setOnClickListener
             }
@@ -85,7 +115,16 @@ class RegisterActivity : AppCompatActivity() {
             tvError.visibility = TextView.GONE
             btnRegister.isEnabled = false
 
-            RetrofitClient.getApiService().register(RegisterRequest(email, password, nombre, sessionManager.getFcmToken()))
+            val request = RegisterRequest(
+                email = email,
+                password = password,
+                nombre = nombre,
+                fcmToken = sessionManager.getFcmToken(),
+                latitud = selectedLat,
+                longitud = selectedLon
+            )
+
+            RetrofitClient.getApiService().register(request)
                 .enqueue(object : retrofit2.Callback<com.utp.basurapp.recolectorapp.data.AuthResponse> {
                     override fun onResponse(
                         call: retrofit2.Call<com.utp.basurapp.recolectorapp.data.AuthResponse>,
@@ -100,6 +139,7 @@ class RegisterActivity : AppCompatActivity() {
                                     body.email ?: email,
                                     body.nombre ?: nombre
                                 )
+                                sessionManager.guardarCoordenadas(selectedLat!!, selectedLon!!)
                                 sessionManager.setUbicacionRegistrada(true)
                                 Toast.makeText(
                                     this@RegisterActivity,
@@ -134,6 +174,31 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
+    private fun obtenerUbicacionGps(onResult: (Double, Double) -> Unit) {
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    onResult(location.latitude, location.longitude)
+                } else {
+                    fusedLocationClient.getCurrentLocation(
+                        com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY,
+                        null
+                    ).addOnSuccessListener { currentLocation ->
+                        if (currentLocation != null) {
+                            onResult(currentLocation.latitude, currentLocation.longitude)
+                        } else {
+                            Toast.makeText(this, "No se pudo obtener la ubicación. Activa el GPS.", Toast.LENGTH_LONG).show()
+                        }
+                    }.addOnFailureListener {
+                        Toast.makeText(this, "Error al obtener ubicación: ${it.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error al obtener ubicación. Activa el GPS.", Toast.LENGTH_LONG).show()
+            }
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -143,7 +208,8 @@ class RegisterActivity : AppCompatActivity() {
         if (requestCode == 200 && grantResults.isNotEmpty() &&
             grantResults[0] == PackageManager.PERMISSION_GRANTED
         ) {
-            Toast.makeText(this, "Ubicación disponible", Toast.LENGTH_SHORT).show()
+            val cardGps = findViewById<MaterialCardView>(R.id.cardLocationGps)
+            cardGps.performClick()
         }
     }
 }

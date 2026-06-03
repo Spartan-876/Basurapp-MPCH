@@ -119,13 +119,6 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="13sp"
-            android:text="¿No tienes cuenta? " />
-
-        <TextView
             android:id="@+id/tvGoToRegister"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -135,11 +128,4 @@
             android:text="@string/link_register" />
     </LinearLayout>
 
-    <ImageView
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/ic_eco"
-        android:alpha="0.4"
-        android:contentDescription="@string/app_name" />
 </LinearLayout>
