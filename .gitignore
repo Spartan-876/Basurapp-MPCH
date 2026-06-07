@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 src/main/resources/Firebase-service-account.json
 RecolectorAPP/app/google-services.json
+ServidorRutas/node_modules
 ### STS ###
 .apt_generated
 .classpath
@@ -42,3 +43,4 @@ AGENTS.md
 .agents
 **/skills-lock.json
 opencode.json
+RecolectorAPP/secrets.properties

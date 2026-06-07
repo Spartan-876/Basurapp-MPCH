@@ -13,12 +13,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import androidx.appcompat.app.AlertDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textfield.TextInputEditText
 import com.utp.basurapp.recolectorapp.api.RetrofitClient
 import com.utp.basurapp.recolectorapp.data.RegisterRequest
 import com.utp.basurapp.recolectorapp.util.SessionManager
+import org.json.JSONObject
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -55,7 +57,6 @@ class RegisterActivity : AppCompatActivity() {
         val etEmail = findViewById<TextInputEditText>(R.id.etRegisterEmail)
         val etPassword = findViewById<TextInputEditText>(R.id.etRegisterPassword)
         val btnRegister = findViewById<MaterialButton>(R.id.btnRegister)
-        val tvError = findViewById<TextView>(R.id.tvRegisterError)
         val tvGoToLogin = findViewById<TextView>(R.id.tvGoToLogin)
         val cardGps = findViewById<MaterialCardView>(R.id.cardLocationGps)
         val cardMap = findViewById<MaterialCardView>(R.id.cardLocationMap)
@@ -76,7 +77,7 @@ class RegisterActivity : AppCompatActivity() {
                 locationSource = "gps"
                 cardGps.strokeColor = ContextCompat.getColor(this, R.color.primary)
                 cardMap.strokeColor = ContextCompat.getColor(this, R.color.outlineVariant)
-                Toast.makeText(this, "Ubicación capturada correctamente", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, R.string.ubicacion_capturada, Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -95,24 +96,20 @@ class RegisterActivity : AppCompatActivity() {
             val password = etPassword.text.toString().trim()
 
             if (nombre.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                tvError.text = "Completa todos los campos"
-                tvError.visibility = TextView.VISIBLE
+                mostrarError("Completa todos los campos")
                 return@setOnClickListener
             }
 
             if (password.length < 6) {
-                tvError.text = "La contraseña debe tener al menos 6 caracteres"
-                tvError.visibility = TextView.VISIBLE
+                mostrarError("La contraseña debe tener al menos 6 caracteres")
                 return@setOnClickListener
             }
 
             if (selectedLat == null || selectedLon == null) {
-                tvError.text = "Selecciona una ubicación usando GPS o el mapa"
-                tvError.visibility = TextView.VISIBLE
+                mostrarError("Selecciona una ubicación usando GPS o el mapa")
                 return@setOnClickListener
             }
 
-            tvError.visibility = TextView.GONE
             btnRegister.isEnabled = false
 
             val request = RegisterRequest(
@@ -149,12 +146,11 @@ class RegisterActivity : AppCompatActivity() {
                                 startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
                                 finish()
                             } else {
-                                tvError.text = "Error del servidor"
-                                tvError.visibility = TextView.VISIBLE
+                                mostrarError("Error del servidor")
                             }
                         } else {
-                            tvError.text = "El email ya está registrado"
-                            tvError.visibility = TextView.VISIBLE
+                            val errorMsg = parsearError(response.errorBody()?.string())
+                            mostrarError(errorMsg)
                         }
                     }
 
@@ -163,14 +159,31 @@ class RegisterActivity : AppCompatActivity() {
                         t: Throwable
                     ) {
                         btnRegister.isEnabled = true
-                        tvError.text = "Error de conexión: ${t.message}"
-                        tvError.visibility = TextView.VISIBLE
+                        mostrarError("Error de conexión: ${t.message}")
                     }
                 })
         }
 
         tvGoToLogin.setOnClickListener {
             finish()
+        }
+    }
+
+    private fun mostrarError(mensaje: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Error")
+            .setMessage(mensaje)
+            .setPositiveButton("Aceptar", null)
+            .show()
+    }
+
+    private fun parsearError(errorBody: String?): String {
+        if (errorBody == null) return "Error desconocido"
+        return try {
+            val json = JSONObject(errorBody)
+            json.optString("error", "Error desconocido")
+        } catch (e: Exception) {
+            "Error desconocido"
         }
     }
 
@@ -187,15 +200,15 @@ class RegisterActivity : AppCompatActivity() {
                         if (currentLocation != null) {
                             onResult(currentLocation.latitude, currentLocation.longitude)
                         } else {
-                            Toast.makeText(this, "No se pudo obtener la ubicación. Activa el GPS.", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this, R.string.gps_no_disponible, Toast.LENGTH_LONG).show()
                         }
                     }.addOnFailureListener {
-                        Toast.makeText(this, "Error al obtener ubicación: ${it.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "${getString(R.string.gps_error)}: ${it.message}", Toast.LENGTH_LONG).show()
                     }
                 }
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Error al obtener ubicación. Activa el GPS.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, R.string.gps_no_disponible, Toast.LENGTH_LONG).show()
             }
     }
 

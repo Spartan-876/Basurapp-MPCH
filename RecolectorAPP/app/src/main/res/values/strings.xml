@@ -128,4 +128,14 @@
     <string name="ubicacion_capturada">Ubicación capturada correctamente</string>
     <string name="gps_no_disponible">No se pudo obtener la ubicación. Activa el GPS.</string>
     <string name="gps_error">Error al obtener ubicación</string>
+
+    <string name="notifications_title">Notificaciones</string>
+    <string name="centrar_ubicacion">Mi ubicación</string>
+    <string name="compartir_alerta">Compartir alerta</string>
+    <string name="zona_chiclayo">Chiclayo</string>
+    <string name="camion_cerca_titulo">¡Camión recolector cerca!</string>
+    <string name="camion_cerca_mensaje">El recolector está por tu zona. Saca la basura de tu casa.</string>
+    <string name="canal_alertas">Alertas Basurapp</string>
+    <string name="ubicacion_fuera_distrito">Tu ubicación debe estar dentro del distrito de Chiclayo</string>
+    <string name="proximoamente">Próximamente</string>
 </resources>

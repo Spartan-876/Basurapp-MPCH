@@ -8,21 +8,22 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.utp.basurapp.recolectorapp.api.RetrofitClient
+import com.utp.basurapp.recolectorapp.data.CamionResponse
+import com.utp.basurapp.recolectorapp.data.PerfilResponse
 import com.utp.basurapp.recolectorapp.util.SessionManager
 import org.maplibre.android.MapLibre
 import org.maplibre.android.WellKnownTileServer
-import org.maplibre.android.maps.MapFragment
-import org.maplibre.android.maps.Style
+import org.maplibre.android.annotations.MarkerOptions
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.camera.CameraUpdateFactory
-import org.maplibre.android.annotations.MarkerOptions
+import org.maplibre.android.maps.MapFragment
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.Style
 
 class HomeFragment : Fragment() {
 
     private var miLat: Double = -6.8681
     private var miLon: Double = -79.8201
-    private var camionLat: Double = -6.8681
-    private var camionLon: Double = -79.8201
     private lateinit var sessionManager: SessionManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -43,12 +44,12 @@ class HomeFragment : Fragment() {
 
         mapFragment?.getMapAsync { mapLibreMap ->
             mapLibreMap.setStyle(Style.Builder().fromUrl("https://tiles.openfreemap.org/styles/liberty")) {
-                cargarUbicacionCamion(mapLibreMap)
+                fetchPerfil(mapLibreMap)
             }
         }
 
         view.findViewById<MaterialButton>(R.id.btnShareAlert).setOnClickListener {
-            compartirAlerta()
+            startActivity(Intent(requireContext(), CompartirAlertaActivity::class.java))
         }
 
         view.findViewById<View>(R.id.btnMyLocation).setOnClickListener {
@@ -65,63 +66,74 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun cargarUbicacionCamion(mapLibreMap: org.maplibre.android.maps.MapLibreMap) {
-        RetrofitClient.getApiService().getCamionUbicacion()
-            .enqueue(object : retrofit2.Callback<com.utp.basurapp.recolectorapp.data.CamionResponse> {
+    private fun fetchPerfil(mapLibreMap: MapLibreMap) {
+        RetrofitClient.getApiService().obtenerPerfil()
+            .enqueue(object : retrofit2.Callback<PerfilResponse> {
                 override fun onResponse(
-                    call: retrofit2.Call<com.utp.basurapp.recolectorapp.data.CamionResponse>,
-                    response: retrofit2.Response<com.utp.basurapp.recolectorapp.data.CamionResponse>
+                    call: retrofit2.Call<PerfilResponse>,
+                    response: retrofit2.Response<PerfilResponse>
                 ) {
                     if (response.isSuccessful) {
                         val body = response.body()
-                        if (body != null) {
-                            camionLat = body.latitud
-                            camionLon = body.longitud
+                        if (body != null && body.latitud != null && body.longitud != null) {
+                            miLat = body.latitud
+                            miLon = body.longitud
+                            sessionManager.guardarCoordenadas(miLat, miLon)
                         }
                     }
-                    actualizarMapa(mapLibreMap)
+                    cargarUbicacionCamion(mapLibreMap)
                 }
 
-                override fun onFailure(
-                    call: retrofit2.Call<com.utp.basurapp.recolectorapp.data.CamionResponse>,
-                    t: Throwable
-                ) {
-                    actualizarMapa(mapLibreMap)
+                override fun onFailure(call: retrofit2.Call<PerfilResponse>, t: Throwable) {
+                    cargarUbicacionCamion(mapLibreMap)
                 }
             })
     }
 
-    private fun actualizarMapa(mapLibreMap: org.maplibre.android.maps.MapLibreMap) {
-        mapLibreMap.clear()
+    private fun cargarUbicacionCamion(mapLibreMap: MapLibreMap) {
+        RetrofitClient.getApiService().getCamionUbicacion()
+            .enqueue(object : retrofit2.Callback<CamionResponse> {
+                override fun onResponse(
+                    call: retrofit2.Call<CamionResponse>,
+                    response: retrofit2.Response<CamionResponse>
+                ) {
+                    var camionLat = miLat + 0.003
+                    var camionLon = miLon + 0.003
 
-        var truckLat = camionLat
-        var truckLon = camionLon
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body != null && body.coordenadas != null && body.activo) {
+                            camionLat = body.coordenadas.latitud
+                            camionLon = body.coordenadas.longitud
+                        }
+                    }
 
-        if (Math.abs(truckLat - miLat) < 0.001 && Math.abs(truckLon - miLon) < 0.001) {
-            truckLat = miLat + 0.003
-            truckLon = miLon + 0.003
-        }
+                    colocarMarcadores(mapLibreMap, camionLat, camionLon)
+                }
 
+                override fun onFailure(call: retrofit2.Call<CamionResponse>, t: Throwable) {
+                    colocarMarcadores(mapLibreMap, miLat + 0.003, miLon + 0.003)
+                }
+            })
+    }
+
+    private fun colocarMarcadores(mapLibreMap: MapLibreMap, camionLat: Double, camionLon: Double) {
         mapLibreMap.addMarker(
             MarkerOptions()
                 .position(LatLng(miLat, miLon))
-                .title("Mi Casa")
+                .title("Mi Ubicacion")
                 .snippet("Punto de alerta")
         )
 
         mapLibreMap.addMarker(
             MarkerOptions()
-                .position(LatLng(truckLat, truckLon))
-                .title("Camión Recolector")
-                .snippet("Ubicación actual")
+                .position(LatLng(camionLat, camionLon))
+                .title("Camion Recolector")
+                .snippet("Ubicacion actual")
         )
 
         mapLibreMap.moveCamera(
             CameraUpdateFactory.newLatLngZoom(LatLng(miLat, miLon), 14.0)
         )
-    }
-
-    private fun compartirAlerta() {
-        startActivity(Intent(requireContext(), CompartirAlertaActivity::class.java))
     }
 }

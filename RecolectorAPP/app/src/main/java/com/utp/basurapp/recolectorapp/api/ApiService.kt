@@ -22,6 +22,9 @@ interface ApiService {
     @PUT("api/usuarios/fcm-token")
     fun actualizarFcmToken(@Body request: FcmTokenRequest): Call<ApiResponse>
 
+    @GET("api/usuarios/perfil")
+    fun obtenerPerfil(): Call<PerfilResponse>
+
     @GET("api/camion/ubicacion")
     fun getCamionUbicacion(): Call<CamionResponse>
 

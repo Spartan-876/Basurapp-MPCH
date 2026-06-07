@@ -27,4 +27,8 @@ public class Usuario {
     @Column(columnDefinition = "geometry(Point, 4326)")
     private Point ubicacionCasa;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "distrito_id")
+    private Distrito distrito;
+
 }

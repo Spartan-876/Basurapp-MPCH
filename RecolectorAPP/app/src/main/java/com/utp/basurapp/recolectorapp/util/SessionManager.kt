@@ -50,15 +50,15 @@ class SessionManager(context: Context) {
 
     fun guardarCoordenadas(lat: Double, lon: Double) {
         prefs.edit().apply {
-            putFloat(KEY_LATITUD, lat.toFloat())
-            putFloat(KEY_LONGITUD, lon.toFloat())
+            putString(KEY_LATITUD, lat.toString())
+            putString(KEY_LONGITUD, lon.toString())
             apply()
         }
     }
 
-    fun getLatitud(): Double = prefs.getFloat(KEY_LATITUD, -6.8681f).toDouble()
+    fun getLatitud(): Double = (prefs.getString(KEY_LATITUD, null) ?: "-6.8681").toDouble()
 
-    fun getLongitud(): Double = prefs.getFloat(KEY_LONGITUD, -79.8201f).toDouble()
+    fun getLongitud(): Double = (prefs.getString(KEY_LONGITUD, null) ?: "-79.8201").toDouble()
 
     fun cerrarSesion() {
         prefs.edit().clear().apply()

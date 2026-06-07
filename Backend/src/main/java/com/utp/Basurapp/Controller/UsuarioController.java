@@ -68,6 +68,28 @@ public class UsuarioController {
         return ResponseEntity.ok(Map.of("message", "Usuario registrado con exito"));
     }
 
+    @GetMapping("/perfil")
+    public ResponseEntity<?> obtenerPerfil(Authentication auth) {
+        String email = auth.getName();
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        response.put("nombre", usuario.getNombre());
+        response.put("email", usuario.getEmail());
+
+        if (usuario.getUbicacionCasa() != null) {
+            response.put("latitud", usuario.getUbicacionCasa().getY());
+            response.put("longitud", usuario.getUbicacionCasa().getX());
+        }
+
+        if (usuario.getDistrito() != null) {
+            response.put("distrito", usuario.getDistrito().getNombre());
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/fcm-token")
     public ResponseEntity<?> actualizarFcmToken(@RequestBody Map<String, String> body, Authentication auth) {
         String email = auth.getName();
