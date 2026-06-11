@@ -22,6 +22,7 @@ class SessionManager(context: Context) {
         private const val KEY_VIBRACION_ACTIVADA = "vibracion_activada"
         private const val KEY_SONIDO_ACTIVADO = "sonido_activado"
         private const val KEY_DIAS_ACTIVOS = "dias_activos"
+        private const val KEY_TEMA = "tema"
     }
 
     fun guardarSesion(token: String, email: String, nombre: String) {
@@ -108,6 +109,12 @@ class SessionManager(context: Context) {
     }
 
     fun isDiaActivo(dia: Int): Boolean = getDiasActivos().contains(dia)
+
+    fun guardarTema(tema: String) {
+        prefs.edit().putString(KEY_TEMA, tema).apply()
+    }
+
+    fun getTema(): String = prefs.getString(KEY_TEMA, "system") ?: "system"
 
     fun cerrarSesion() {
         prefs.edit().clear().apply()

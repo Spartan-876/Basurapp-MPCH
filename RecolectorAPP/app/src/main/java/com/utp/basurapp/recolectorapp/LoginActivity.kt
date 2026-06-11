@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.messaging.FirebaseMessaging
@@ -17,10 +18,11 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        sessionManager = SessionManager(this)
+        aplicarTema(sessionManager.getTema())
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
-        sessionManager = SessionManager(this)
         RetrofitClient.init(sessionManager)
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
@@ -129,5 +131,13 @@ class LoginActivity : AppCompatActivity() {
         }
         startActivity(destino)
         finish()
+    }
+
+    private fun aplicarTema(tema: String) {
+        when (tema) {
+            "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        }
     }
 }

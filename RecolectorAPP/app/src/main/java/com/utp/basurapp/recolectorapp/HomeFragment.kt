@@ -5,6 +5,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
@@ -16,6 +18,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -27,6 +30,7 @@ import com.utp.basurapp.recolectorapp.data.PerfilResponse
 import com.utp.basurapp.recolectorapp.util.SessionManager
 import org.maplibre.android.MapLibre
 import org.maplibre.android.WellKnownTileServer
+import org.maplibre.android.annotations.IconFactory
 import org.maplibre.android.annotations.MarkerOptions
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
@@ -86,7 +90,7 @@ class HomeFragment : Fragment() {
         setupMap()
 
         view.findViewById<FloatingActionButton>(R.id.btnMiUbicacion).setOnClickListener {
-            map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(miLat, miLon), 14.0))
+            map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(miLat, miLon), 16.0))
         }
 
         view.findViewById<FloatingActionButton>(R.id.btnCompartir).setOnClickListener {
@@ -103,7 +107,7 @@ class HomeFragment : Fragment() {
             .camera(
                 CameraPosition.Builder()
                     .target(LatLng(miLat, miLon))
-                    .zoom(14.0)
+                    .zoom(16.0)
                     .build()
             )
 
@@ -293,23 +297,42 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun drawableToBitmap(resId: Int): Bitmap {
+        val context = requireContext()
+        val drawable = AppCompatResources.getDrawable(context, resId)
+            ?: throw IllegalStateException("Drawable not found: $resId")
+        val density = context.resources.displayMetrics.density
+        val size = (48 * density).toInt()
+        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, size, size)
+        drawable.draw(canvas)
+        return bitmap
+    }
+
     private fun actualizarMarcadores(mapLibreMap: MapLibreMap, camionLat: Double, camionLon: Double) {
+        val context = requireContext()
+
         if (userMarker == null) {
+            val homeIcon = IconFactory.getInstance(context).fromBitmap(drawableToBitmap(R.drawable.ic_home_marker))
             userMarker = mapLibreMap.addMarker(
                 MarkerOptions()
                     .position(LatLng(miLat, miLon))
                     .title("Mi Ubicacion")
                     .snippet("Tu punto de alerta")
+                    .icon(homeIcon)
             )
-            mapLibreMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(miLat, miLon), 14.0))
+            mapLibreMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(miLat, miLon), 16.0))
         }
 
         if (truckMarker == null) {
+            val truckIcon = IconFactory.getInstance(context).fromBitmap(drawableToBitmap(R.drawable.ic_truck_marker))
             truckMarker = mapLibreMap.addMarker(
                 MarkerOptions()
                     .position(LatLng(camionLat, camionLon))
                     .title("Camion Recolector")
                     .snippet("Ubicacion actual")
+                    .icon(truckIcon)
             )
         } else {
             truckMarker?.position = LatLng(camionLat, camionLon)
