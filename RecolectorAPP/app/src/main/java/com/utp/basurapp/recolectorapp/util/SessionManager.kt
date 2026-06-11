@@ -16,6 +16,12 @@ class SessionManager(context: Context) {
         private const val KEY_FCM_TOKEN = "fcm_token"
         private const val KEY_LATITUD = "latitud"
         private const val KEY_LONGITUD = "longitud"
+        private const val KEY_DIRECCION = "direccion"
+        private const val KEY_RADIO_ALERTAS = "radio_alertas"
+        private const val KEY_ALERTAS_ACTIVADAS = "alertas_activadas"
+        private const val KEY_VIBRACION_ACTIVADA = "vibracion_activada"
+        private const val KEY_SONIDO_ACTIVADO = "sonido_activado"
+        private const val KEY_DIAS_ACTIVOS = "dias_activos"
     }
 
     fun guardarSesion(token: String, email: String, nombre: String) {
@@ -59,6 +65,49 @@ class SessionManager(context: Context) {
     fun getLatitud(): Double = (prefs.getString(KEY_LATITUD, null) ?: "-6.8681").toDouble()
 
     fun getLongitud(): Double = (prefs.getString(KEY_LONGITUD, null) ?: "-79.8201").toDouble()
+
+    fun guardarDireccion(direccion: String) {
+        prefs.edit().putString(KEY_DIRECCION, direccion).apply()
+    }
+
+    fun getDireccion(): String = prefs.getString(KEY_DIRECCION, "") ?: ""
+
+    fun guardarRadioAlertas(radioMetros: Int) {
+        prefs.edit().putInt(KEY_RADIO_ALERTAS, radioMetros).apply()
+    }
+
+    fun getRadioAlertas(): Int = prefs.getInt(KEY_RADIO_ALERTAS, 250)
+
+    fun setAlertasActivadas(activadas: Boolean) {
+        prefs.edit().putBoolean(KEY_ALERTAS_ACTIVADAS, activadas).apply()
+    }
+
+    fun isAlertasActivadas(): Boolean = prefs.getBoolean(KEY_ALERTAS_ACTIVADAS, true)
+
+    fun setVibracionActivada(activada: Boolean) {
+        prefs.edit().putBoolean(KEY_VIBRACION_ACTIVADA, activada).apply()
+    }
+
+    fun isVibracionActivada(): Boolean = prefs.getBoolean(KEY_VIBRACION_ACTIVADA, true)
+
+    fun setSonidoActivado(activado: Boolean) {
+        prefs.edit().putBoolean(KEY_SONIDO_ACTIVADO, activado).apply()
+    }
+
+    fun isSonidoActivado(): Boolean = prefs.getBoolean(KEY_SONIDO_ACTIVADO, true)
+
+    fun guardarDiasActivos(dias: Set<Int>) {
+        val sb = StringBuilder()
+        dias.forEach { if (sb.isNotEmpty()) sb.append(","); sb.append(it) }
+        prefs.edit().putString(KEY_DIAS_ACTIVOS, sb.toString()).apply()
+    }
+
+    fun getDiasActivos(): Set<Int> {
+        val str = prefs.getString(KEY_DIAS_ACTIVOS, "0,1,2,3,4") ?: "0,1,2,3,4"
+        return if (str.isEmpty()) emptySet() else str.split(",").map { it.trim().toInt() }.toSet()
+    }
+
+    fun isDiaActivo(dia: Int): Boolean = getDiasActivos().contains(dia)
 
     fun cerrarSesion() {
         prefs.edit().clear().apply()

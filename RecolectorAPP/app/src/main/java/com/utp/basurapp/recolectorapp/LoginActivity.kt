@@ -72,6 +72,9 @@ class LoginActivity : AppCompatActivity() {
                                 if (body.latitud != null && body.longitud != null) {
                                     sessionManager.guardarCoordenadas(body.latitud, body.longitud)
                                 }
+                                if (!body.direccion.isNullOrEmpty()) {
+                                    sessionManager.guardarDireccion(body.direccion)
+                                }
                                 sessionManager.setUbicacionRegistrada(true)
                                 sessionManager.getFcmToken()?.let { token ->
                                     RetrofitClient.getApiService().actualizarFcmToken(FcmTokenRequest(token))

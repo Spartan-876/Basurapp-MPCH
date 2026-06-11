@@ -1,6 +1,12 @@
 package com.utp.basurapp.recolectorapp
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.media.RingtoneManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -8,7 +14,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.utp.basurapp.recolectorapp.api.RetrofitClient
@@ -24,7 +34,11 @@ import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapFragment
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapLibreMapOptions
+import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
+import org.maplibre.android.plugins.annotation.Circle
+import org.maplibre.android.plugins.annotation.CircleManager
+import org.maplibre.android.plugins.annotation.CircleOptions
 
 class HomeFragment : Fragment() {
 
@@ -35,6 +49,11 @@ class HomeFragment : Fragment() {
     private var map: MapLibreMap? = null
     private var userMarker: org.maplibre.android.annotations.Marker? = null
     private var truckMarker: org.maplibre.android.annotations.Marker? = null
+    private var circleManager: CircleManager? = null
+    private var userCircle: Circle? = null
+    private var notificacionesEnviadas: Int = 0
+    private var camionEnZona: Boolean = false
+    private val MAX_NOTIFICACIONES_LOCALES = 2
 
     private val refreshHandler = Handler(Looper.getMainLooper())
     private val refreshInterval = 8000L
@@ -59,7 +78,12 @@ class HomeFragment : Fragment() {
         miLat = sessionManager.getLatitud()
         miLon = sessionManager.getLongitud()
 
-        setupMap(view)
+        val direccionGuardada = sessionManager.getDireccion()
+        if (direccionGuardada.isNotEmpty()) {
+            view.findViewById<TextView>(R.id.tvZona).text = direccionGuardada
+        }
+
+        setupMap()
 
         view.findViewById<FloatingActionButton>(R.id.btnMiUbicacion).setOnClickListener {
             map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(miLat, miLon), 14.0))
@@ -74,7 +98,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setupMap(view: View) {
+    private fun setupMap() {
         val options = MapLibreMapOptions.createFromAttributes(requireContext(), null)
             .camera(
                 CameraPosition.Builder()
@@ -90,7 +114,8 @@ class HomeFragment : Fragment() {
 
         mapFragment.getMapAsync { mapLibreMap ->
             map = mapLibreMap
-            mapLibreMap.setStyle(Style.Builder().fromUrl("https://tiles.openfreemap.org/styles/liberty")) {
+            mapLibreMap.setStyle(Style.Builder().fromUrl("https://tiles.openfreemap.org/styles/liberty")) { style ->
+                circleManager = CircleManager(mapFragment.requireView() as MapView, mapLibreMap, style)
                 fetchPerfil(mapLibreMap)
             }
         }
@@ -110,14 +135,40 @@ class HomeFragment : Fragment() {
                             miLon = body.longitud
                             sessionManager.guardarCoordenadas(miLat, miLon)
                         }
+                        if (body?.direccion != null && body.direccion.isNotEmpty()) {
+                            sessionManager.guardarDireccion(body.direccion)
+                            view?.findViewById<TextView>(R.id.tvZona)?.text = body.direccion
+                        }
                     }
+                    dibujarRadioUsuario(mapLibreMap)
                     fetchUbicacionCamion()
                 }
 
                 override fun onFailure(call: retrofit2.Call<PerfilResponse>, t: Throwable) {
+                    dibujarRadioUsuario(mapLibreMap)
                     fetchUbicacionCamion()
                 }
             })
+    }
+
+    private fun dibujarRadioUsuario(mapLibreMap: MapLibreMap) {
+        val radioMetros = sessionManager.getRadioAlertas().toDouble()
+        val radioGrados = radioMetros / 111000.0
+
+        if (userCircle != null) {
+            circleManager?.delete(userCircle)
+        }
+
+        val circleOptions = CircleOptions()
+            .withLatLng(LatLng(miLat, miLon))
+            .withCircleRadius(radioGrados.toFloat())
+            .withCircleColor("#2E7D32")
+            .withCircleOpacity(0.15f)
+            .withCircleStrokeColor("#0d631b")
+            .withCircleStrokeWidth(2f)
+            .withCircleStrokeOpacity(0.5f)
+
+        userCircle = circleManager?.create(circleOptions)
     }
 
     private fun fetchUbicacionCamion() {
@@ -140,15 +191,106 @@ class HomeFragment : Fragment() {
                         }
                     }
 
+                    verificarProximidad(camionLat, camionLon)
                     actualizarMarcadores(currentMap, camionLat, camionLon)
                 }
 
                 override fun onFailure(call: retrofit2.Call<CamionResponse>, t: Throwable) {
                     val camionLat = miLat + 0.003
                     val camionLon = miLon + 0.003
+                    verificarProximidad(camionLat, camionLon)
                     actualizarMarcadores(currentMap, camionLat, camionLon)
                 }
             })
+    }
+
+    private fun verificarProximidad(camionLat: Double, camionLon: Double) {
+        if (!sessionManager.isAlertasActivadas()) return
+
+        val hoy = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_WEEK) - 1
+        if (!sessionManager.isDiaActivo(hoy)) return
+
+        val distancia = calcularDistanciaMetros(miLat, miLon, camionLat, camionLon)
+        val radioMetros = sessionManager.getRadioAlertas().toDouble()
+        val distanciaEnZona = distancia <= radioMetros
+
+        if (!distanciaEnZona) {
+            if (camionEnZona) {
+                camionEnZona = false
+                notificacionesEnviadas = 0
+            }
+            return
+        }
+
+        if (!camionEnZona) {
+            camionEnZona = true
+            notificacionesEnviadas = 0
+        }
+
+        if (notificacionesEnviadas < MAX_NOTIFICACIONES_LOCALES) {
+            val distStr = if (distancia < 1000) "${distancia.toInt()} m" else "${"%.1f".format(distancia / 1000)} km"
+            mostrarNotificacionCamion(distStr)
+            notificacionesEnviadas++
+        }
+    }
+
+    private fun calcularDistanciaMetros(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        val radioTierra = 6371000.0
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+        val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2)
+        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        return radioTierra * c
+    }
+
+    private fun mostrarNotificacionCamion(distancia: String) {
+        val channelId = "basura_alerta"
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "Alertas de Camion",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notificaciones cuando el camion esta cerca"
+                enableVibration(true)
+                vibrationPattern = longArrayOf(0, 500, 200, 500)
+                if (sessionManager.isVibracionActivada()) {
+                    enableVibration(true)
+                } else {
+                    enableVibration(false)
+                }
+            }
+            val nm = requireContext().getSystemService(NotificationManager::class.java)
+            nm.createNotificationChannel(channel)
+        }
+
+        val sonido = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+
+        val builder = NotificationCompat.Builder(requireContext(), channelId)
+            .setSmallIcon(R.drawable.ic_notificacion_camion)
+            .setContentTitle("Camion Recolector cerca")
+            .setContentText("A $distancia de tu ubicacion")
+            .setStyle(NotificationCompat.BigTextStyle()
+                .bigText("El camion recolector esta a $distancia. Prepara las bolsas de basura."))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+
+        if (sessionManager.isVibracionActivada()) {
+            builder.setVibrate(longArrayOf(0, 500, 200, 500))
+        }
+
+        if (sessionManager.isSonidoActivado()) {
+            builder.setSound(sonido)
+        }
+
+        builder.setDefaults(NotificationCompat.DEFAULT_ALL)
+
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            NotificationManagerCompat.from(requireContext()).notify(1001, builder.build())
+        }
     }
 
     private fun actualizarMarcadores(mapLibreMap: MapLibreMap, camionLat: Double, camionLon: Double) {
@@ -176,6 +318,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        dibujarRadioUsuario(map ?: return)
         refreshHandler.postDelayed(refreshRunnable, refreshInterval)
     }
 
@@ -187,8 +330,11 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         refreshHandler.removeCallbacks(refreshRunnable)
+        circleManager?.onDestroy()
         map = null
         userMarker = null
         truckMarker = null
+        userCircle = null
+        circleManager = null
     }
 }

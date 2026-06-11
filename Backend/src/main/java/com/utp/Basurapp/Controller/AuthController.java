@@ -79,6 +79,10 @@ public class AuthController {
             usuario.setFcmToken(body.get("fcmToken").toString());
         }
 
+        if (body.containsKey("direccion") && body.get("direccion") != null) {
+            usuario.setDireccionRegistrada(body.get("direccion").toString());
+        }
+
         usuarioRepository.save(usuario);
 
         String token = jwtUtil.generarToken(email);
@@ -89,7 +93,8 @@ public class AuthController {
                 "nombre", nombre,
                 "distrito", distritoOpt.get().getNombre(),
                 "latitud", lat,
-                "longitud", lon
+                "longitud", lon,
+                "direccion", usuario.getDireccionRegistrada() != null ? usuario.getDireccionRegistrada() : ""
         ));
     }
 
@@ -136,6 +141,8 @@ public class AuthController {
             response.put("latitud", usuario.getUbicacionCasa().getY());
             response.put("longitud", usuario.getUbicacionCasa().getX());
         }
+
+        response.put("direccion", usuario.getDireccionRegistrada() != null ? usuario.getDireccionRegistrada() : "");
 
         return ResponseEntity.ok(response);
     }

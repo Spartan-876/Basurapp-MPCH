@@ -1,7 +1,5 @@
 package com.utp.Basurapp.Controller;
 
-import com.utp.Basurapp.Config.CamionUbicacionStore;
-import com.utp.Basurapp.Service.AlertaService;
 import com.utp.Basurapp.dto.FamiliarDTO;
 import com.utp.Basurapp.dto.UsuarioDTO;
 import com.utp.Basurapp.Model.Familiar;
@@ -25,20 +23,14 @@ public class UsuarioController {
 
     private final UsuarioRepository usuarioRepository;
     private final FamiliarRepository familiarRepository;
-    private final AlertaService alertaService;
-    private final CamionUbicacionStore camionUbicacionStore;
     private final PasswordEncoder passwordEncoder;
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
     public UsuarioController(UsuarioRepository usuarioRepository,
             FamiliarRepository familiarRepository,
-            AlertaService alertaService,
-            CamionUbicacionStore camionUbicacionStore,
             PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.familiarRepository = familiarRepository;
-        this.alertaService = alertaService;
-        this.camionUbicacionStore = camionUbicacionStore;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -87,6 +79,8 @@ public class UsuarioController {
             response.put("distrito", usuario.getDistrito().getNombre());
         }
 
+        response.put("direccion", usuario.getDireccionRegistrada() != null ? usuario.getDireccionRegistrada() : "");
+
         return ResponseEntity.ok(response);
     }
 
@@ -103,6 +97,23 @@ public class UsuarioController {
         }
 
         return ResponseEntity.ok(Map.of("message", "Token actualizado"));
+    }
+
+    @PutMapping("/direccion")
+    public ResponseEntity<?> actualizarDireccion(@RequestBody Map<String, String> body, Authentication auth) {
+        String email = auth.getName();
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        String direccion = body.get("direccion");
+        if (direccion == null || direccion.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "direccion es obligatoria"));
+        }
+
+        usuario.setDireccionRegistrada(direccion.trim());
+        usuarioRepository.save(usuario);
+
+        return ResponseEntity.ok(Map.of("message", "Direccion actualizada", "direccion", direccion.trim()));
     }
 
     @GetMapping("/familiares")
@@ -194,15 +205,5 @@ public class UsuarioController {
 
         familiarRepository.delete(familiar);
         return ResponseEntity.ok(Map.of("message", "Familiar eliminado con exito"));
-    }
-
-    @GetMapping("/prueba-camion")
-    public String probarCamion(@RequestParam double lat, @RequestParam double lon) {
-        Point punto = geometryFactory.createPoint(new Coordinate(lon, lat));
-        punto.setSRID(4326);
-        camionUbicacionStore.actualizarUbicacion(punto);
-
-        alertaService.procesarUbicacionCamion(lat, lon);
-        return "Procesando ubicacion del camion...";
     }
 }

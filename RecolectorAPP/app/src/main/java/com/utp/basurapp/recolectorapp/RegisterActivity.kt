@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,6 +21,7 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textfield.TextInputEditText
 import com.utp.basurapp.recolectorapp.api.RetrofitClient
 import com.utp.basurapp.recolectorapp.data.RegisterRequest
+import com.utp.basurapp.recolectorapp.service.GeocodingService
 import com.utp.basurapp.recolectorapp.util.SessionManager
 import org.json.JSONObject
 
@@ -30,6 +33,7 @@ class RegisterActivity : AppCompatActivity() {
     private var selectedLat: Double? = null
     private var selectedLon: Double? = null
     private var locationSource: String? = null
+    private var direccionSeleccionada: String = ""
 
     private val mapSelectorLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -42,6 +46,11 @@ class RegisterActivity : AppCompatActivity() {
             val cardGps = findViewById<MaterialCardView>(R.id.cardLocationGps)
             cardMap.strokeColor = ContextCompat.getColor(this, R.color.primary)
             cardGps.strokeColor = ContextCompat.getColor(this, R.color.outlineVariant)
+            if (selectedLat != null && selectedLon != null) {
+                GeocodingService.obtenerDireccion(selectedLat!!, selectedLon!!) { dir ->
+                    direccionSeleccionada = dir ?: ""
+                }
+            }
         }
     }
 
@@ -78,6 +87,9 @@ class RegisterActivity : AppCompatActivity() {
                 cardGps.strokeColor = ContextCompat.getColor(this, R.color.primary)
                 cardMap.strokeColor = ContextCompat.getColor(this, R.color.outlineVariant)
                 Toast.makeText(this, R.string.ubicacion_capturada, Toast.LENGTH_SHORT).show()
+                GeocodingService.obtenerDireccion(lat, lon) { dir ->
+                    direccionSeleccionada = dir ?: ""
+                }
             }
         }
 
@@ -111,62 +123,85 @@ class RegisterActivity : AppCompatActivity() {
             }
 
             btnRegister.isEnabled = false
+            btnRegister.text = "Obteniendo dirección..."
 
-            val request = RegisterRequest(
-                email = email,
-                password = password,
-                nombre = nombre,
-                fcmToken = sessionManager.getFcmToken(),
-                latitud = selectedLat,
-                longitud = selectedLon
-            )
-
-            RetrofitClient.getApiService().register(request)
-                .enqueue(object : retrofit2.Callback<com.utp.basurapp.recolectorapp.data.AuthResponse> {
-                    override fun onResponse(
-                        call: retrofit2.Call<com.utp.basurapp.recolectorapp.data.AuthResponse>,
-                        response: retrofit2.Response<com.utp.basurapp.recolectorapp.data.AuthResponse>
-                    ) {
-                        btnRegister.isEnabled = true
-                        if (response.isSuccessful) {
-                            val body = response.body()
-                            if (body != null && body.token != null) {
-                                sessionManager.guardarSesion(
-                                    body.token,
-                                    body.email ?: email,
-                                    body.nombre ?: nombre
-                                )
-                                sessionManager.guardarCoordenadas(selectedLat!!, selectedLon!!)
-                                sessionManager.setUbicacionRegistrada(true)
-                                Toast.makeText(
-                                    this@RegisterActivity,
-                                    "Cuenta creada exitosamente",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
-                                finish()
-                            } else {
-                                mostrarError("Error del servidor")
-                            }
-                        } else {
-                            val errorMsg = parsearError(response.errorBody()?.string())
-                            mostrarError(errorMsg)
-                        }
+            if (selectedLat != null && selectedLon != null) {
+                GeocodingService.obtenerDireccion(selectedLat!!, selectedLon!!) { dir ->
+                    direccionSeleccionada = dir ?: ""
+                    runOnUiThread {
+                        btnRegister.text = "Registrando..."
+                        enviarRegistro(nombre, email, password, btnRegister)
                     }
-
-                    override fun onFailure(
-                        call: retrofit2.Call<com.utp.basurapp.recolectorapp.data.AuthResponse>,
-                        t: Throwable
-                    ) {
-                        btnRegister.isEnabled = true
-                        mostrarError("Error de conexión: ${t.message}")
-                    }
-                })
+                }
+            } else {
+                enviarRegistro(nombre, email, password, btnRegister)
+            }
         }
 
         tvGoToLogin.setOnClickListener {
             finish()
         }
+    }
+
+    private fun enviarRegistro(nombre: String, email: String, password: String, btnRegister: MaterialButton) {
+        val request = RegisterRequest(
+            email = email,
+            password = password,
+            nombre = nombre,
+            fcmToken = sessionManager.getFcmToken(),
+            latitud = selectedLat,
+            longitud = selectedLon,
+            direccion = direccionSeleccionada.ifEmpty { null }
+        )
+
+        RetrofitClient.getApiService().register(request)
+            .enqueue(object : retrofit2.Callback<com.utp.basurapp.recolectorapp.data.AuthResponse> {
+                override fun onResponse(
+                    call: retrofit2.Call<com.utp.basurapp.recolectorapp.data.AuthResponse>,
+                    response: retrofit2.Response<com.utp.basurapp.recolectorapp.data.AuthResponse>
+                ) {
+                    btnRegister.isEnabled = true
+                    btnRegister.text = getString(R.string.btn_register)
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body != null && body.token != null) {
+                            sessionManager.guardarSesion(
+                                body.token,
+                                body.email ?: email,
+                                body.nombre ?: nombre
+                            )
+                            sessionManager.guardarCoordenadas(selectedLat!!, selectedLon!!)
+                            if (!body.direccion.isNullOrEmpty()) {
+                                sessionManager.guardarDireccion(body.direccion)
+                            } else if (direccionSeleccionada.isNotEmpty()) {
+                                sessionManager.guardarDireccion(direccionSeleccionada)
+                            }
+                            sessionManager.setUbicacionRegistrada(true)
+                            Toast.makeText(
+                                this@RegisterActivity,
+                                "Cuenta creada exitosamente",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
+                            finish()
+                        } else {
+                            mostrarError("Error del servidor")
+                        }
+                    } else {
+                        val errorMsg = parsearError(response.errorBody()?.string())
+                        mostrarError(errorMsg)
+                    }
+                }
+
+                override fun onFailure(
+                    call: retrofit2.Call<com.utp.basurapp.recolectorapp.data.AuthResponse>,
+                    t: Throwable
+                ) {
+                    btnRegister.isEnabled = true
+                    btnRegister.text = getString(R.string.btn_register)
+                    mostrarError("Error de conexión: ${t.message}")
+                }
+            })
     }
 
     private fun mostrarError(mensaje: String) {

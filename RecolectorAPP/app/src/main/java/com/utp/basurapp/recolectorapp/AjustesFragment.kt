@@ -30,6 +30,10 @@ class AjustesFragment : Fragment() {
         view.findViewById<TextView>(R.id.tvSettingsName).text = nombre ?: "Usuario Ciudadano"
         view.findViewById<TextView>(R.id.tvSettingsEmail).text = email ?: "usuario@ciudad.gob"
 
+        val direccion = sessionManager.getDireccion()
+        view.findViewById<TextView>(R.id.tvSettingsAddress).text =
+            if (direccion.isNotEmpty()) direccion else "Sin dirección registrada"
+
         view.findViewById<MaterialButton>(R.id.btnLogout).setOnClickListener {
             sessionManager.cerrarSesion()
             startActivity(Intent(requireContext(), LoginActivity::class.java))

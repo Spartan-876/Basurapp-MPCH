@@ -36,4 +36,7 @@ interface ApiService {
 
     @DELETE("api/usuarios/familiares/{id}")
     fun eliminarFamiliar(@Path("id") id: Long): Call<ApiResponse>
+
+    @PUT("api/usuarios/direccion")
+    fun actualizarDireccion(@Body request: DireccionRequest): Call<ApiResponse>
 }

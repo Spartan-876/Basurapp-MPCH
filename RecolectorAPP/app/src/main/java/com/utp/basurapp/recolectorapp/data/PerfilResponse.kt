@@ -5,5 +5,6 @@ data class PerfilResponse(
     val email: String?,
     val latitud: Double?,
     val longitud: Double?,
-    val distrito: String?
+    val distrito: String?,
+    val direccion: String? = null
 )

@@ -15,7 +15,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     boolean existsByEmail(String email);
 
     @Query(value = "SELECT * FROM usuarios u WHERE " +
-            "ST_DWithin(u.ubicacion_casa, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326), :radioMetros)",
+            "ST_DWithin(u.ubicacion_casa::geography, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, :radioMetros)",
             nativeQuery = true)
     List<Usuario> encontrarUsuariosEnRadio(
             @Param("lat") double lat,

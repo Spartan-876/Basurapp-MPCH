@@ -6,5 +6,6 @@ data class RegisterRequest(
     val nombre: String,
     val fcmToken: String? = null,
     val latitud: Double? = null,
-    val longitud: Double? = null
+    val longitud: Double? = null,
+    val direccion: String? = null
 )

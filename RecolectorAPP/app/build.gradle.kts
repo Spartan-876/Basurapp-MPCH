@@ -70,6 +70,7 @@ dependencies {
 
     // MapLibre
     implementation("org.maplibre.gl:android-sdk:13.2.0")
+    implementation("org.maplibre.gl:android-plugin-annotation-v9:3.0.2")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:3.0.0")

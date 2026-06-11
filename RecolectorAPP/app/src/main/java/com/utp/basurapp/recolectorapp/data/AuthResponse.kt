@@ -6,5 +6,6 @@ data class AuthResponse(
     val nombre: String?,
     val error: String?,
     val latitud: Double? = null,
-    val longitud: Double? = null
+    val longitud: Double? = null,
+    val direccion: String? = null
 )
