@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Basurapp</string>
+    <string name="app_name">EcoCix</string>
     <string name="app_tagline_login">Gestión cívica para una ciudad más limpia</string>
 
-    <string name="btn_login">Acceder a mi cuenta</string>
+    <string name="btn_login">Iniciar Sesion</string>
     <string name="btn_register">Crear cuenta</string>
     <string name="btn_send_report">Enviar reporte</string>
     <string name="btn_save_changes">Guardar Cambios</string>
@@ -31,7 +31,7 @@
     <string name="alerts_title">Alertas de Proximidad</string>
 
     <string name="service_normal">Servicio Normal</string>
-    <string name="zone_label">Tu zona: Pimentel</string>
+    <string name="zone_label">Tu zona: Zona1</string>
     <string name="schedule_label">Horario de recolección de la zona</string>
     <string name="arrival_time">Aprox. en tu domicilio</string>
     <string name="swipe_up_info">Desliza hacia arriba para más info</string>

@@ -5,6 +5,8 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.slider.Slider
@@ -18,6 +20,12 @@ class AlertasConfigActivity : AppCompatActivity() {
 
         val sessionManager = SessionManager(this)
 
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.headerConfig)) { v, insets ->
+            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            v.setPadding(v.paddingLeft, statusBarHeight + 12, v.paddingRight, 12)
+            insets
+        }
+
         findViewById<View>(R.id.btnBack).setOnClickListener {
             finish()
         }
@@ -28,15 +36,15 @@ class AlertasConfigActivity : AppCompatActivity() {
 
         val sliderRadius = findViewById<Slider>(R.id.sliderRadius)
         val tvRadiusValue = findViewById<TextView>(R.id.tvRadiusValue)
-        val switchAlerts = findViewById<SwitchMaterial>(R.id.switchAlerts)
         val switchVibration = findViewById<SwitchMaterial>(R.id.switchAlertVibration)
+        val switchSound = findViewById<SwitchMaterial>(R.id.switchSound)
 
         val radioGuardado = sessionManager.getRadioAlertas()
         sliderRadius.value = radioGuardado.toFloat().coerceIn(sliderRadius.valueFrom, sliderRadius.valueTo)
         tvRadiusValue.text = "${radioGuardado} m"
 
-        switchAlerts.isChecked = sessionManager.isAlertasActivadas()
         switchVibration.isChecked = sessionManager.isVibracionActivada()
+        switchSound.isChecked = sessionManager.isSonidoActivado()
 
         sliderRadius.addOnChangeListener { _, value, _ ->
             tvRadiusValue.text = "${value.toInt()} m"
@@ -75,13 +83,12 @@ class AlertasConfigActivity : AppCompatActivity() {
 
         findViewById<MaterialButton>(R.id.btnSaveAlertConfig).setOnClickListener {
             val radius = sliderRadius.value.toInt()
-            val alertsOn = switchAlerts.isChecked
             val vibrationOn = switchVibration.isChecked
+            val soundOn = switchSound.isChecked
 
             sessionManager.guardarRadioAlertas(radius)
-            sessionManager.setAlertasActivadas(alertsOn)
             sessionManager.setVibracionActivada(vibrationOn)
-            sessionManager.setSonidoActivado(true)
+            sessionManager.setSonidoActivado(soundOn)
             sessionManager.guardarDiasActivos(selectedDays)
 
             Toast.makeText(

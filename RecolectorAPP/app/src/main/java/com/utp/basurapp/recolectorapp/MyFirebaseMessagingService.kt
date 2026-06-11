@@ -10,6 +10,7 @@ import com.google.firebase.messaging.RemoteMessage
 import com.utp.basurapp.recolectorapp.api.RetrofitClient
 import com.utp.basurapp.recolectorapp.data.ApiResponse
 import com.utp.basurapp.recolectorapp.data.FcmTokenRequest
+import com.utp.basurapp.recolectorapp.util.NotificationHistoryManager
 import com.utp.basurapp.recolectorapp.util.SessionManager
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
@@ -59,5 +60,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
 
         notificationManager.notify(1, builder.build())
+
+        NotificationHistoryManager.guardar(
+            this,
+            title,
+            message,
+            "importante"
+        )
     }
 }

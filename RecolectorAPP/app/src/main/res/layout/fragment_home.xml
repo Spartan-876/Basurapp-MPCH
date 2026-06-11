@@ -3,18 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
-    android:fitsSystemWindows="true">
+    android:background="?attr/colorSurface">
 
     <!-- Header: Stitch style -->
     <LinearLayout
         android:id="@+id/headerHome"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:orientation="horizontal"
         android:gravity="center_vertical"
+        android:minHeight="56dp"
         android:paddingHorizontal="20dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
         android:background="?attr/colorSurface"
         android:elevation="2dp">
 
@@ -48,31 +50,24 @@
     </LinearLayout>
 
     <!-- Map container -->
+
+    <!-- Card: Servicio Normal / Chiclayo -->
     <FrameLayout
         android:id="@+id/mapContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="56dp">
+        android:layout_marginTop="0dp" />
 
-        <fragment
-            android:id="@+id/mapFragment"
-            android:name="org.maplibre.android.maps.MapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </FrameLayout>
-
-    <!-- Card: Servicio Normal / Chiclayo -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardServicioNormal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|start"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="96dp"
         app:cardCornerRadius="12dp"
         app:cardElevation="4dp"
-        app:strokeColor="@color/outlineVariant"
+        app:strokeColor="?attr/colorOutlineVariant"
         app:strokeWidth="1dp"
         app:contentPadding="12dp"
         app:cardBackgroundColor="?attr/colorSurface">
@@ -88,7 +83,7 @@
                 android:layout_height="24dp"
                 android:src="@drawable/ic_check_circle"
                 android:scaleType="centerInside"
-                app:tint="@color/primary"
+                app:tint="?attr/colorPrimary"
                 android:contentDescription="@string/service_normal" />
 
             <LinearLayout
@@ -125,12 +120,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|end"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="96dp"
         android:layout_marginEnd="16dp"
         android:src="@drawable/ic_my_location"
         android:contentDescription="@string/location_gps"
-        app:backgroundTint="@color/surfaceContainerLowest"
-        app:tint="@color/primary"
+        app:backgroundTint="?attr/colorSurfaceContainerLowest"
+        app:tint="?attr/colorPrimary"
         app:fabSize="normal"
         app:elevation="4dp"
         app:borderWidth="0dp" />
@@ -145,8 +140,8 @@
         android:layout_marginEnd="16dp"
         android:src="@drawable/ic_share"
         android:contentDescription="@string/share_alert"
-        app:backgroundTint="@color/primaryContainer"
-        app:tint="@android:color/white"
+                        app:backgroundTint="?attr/colorPrimaryContainer"
+        app:tint="?attr/colorOnPrimary"
         app:fabSize="normal"
         app:elevation="6dp"
         app:borderWidth="0dp" />

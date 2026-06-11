@@ -9,11 +9,12 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         app:title="@string/compartir_alerta_title"
-        app:titleTextColor="@color/onPrimary"
+        app:titleTextColor="?attr/colorOnPrimary"
         app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationIconTint="?attr/colorOnPrimary"
         app:popupTheme="@style/ThemeOverlay.Material3.Light" />
 
     <ScrollView
@@ -33,7 +34,7 @@
                 app:cardElevation="2dp"
                 app:cardCornerRadius="12dp"
                 app:strokeWidth="0dp"
-                app:cardBackgroundColor="@color/primaryContainer">
+                app:cardBackgroundColor="?attr/colorPrimaryContainer">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -47,7 +48,8 @@
                         android:layout_height="40dp"
                         android:src="@drawable/ic_notifications_active"
                         android:contentDescription="@null"
-                        android:layout_marginEnd="12dp" />
+                        android:layout_marginEnd="12dp"
+                        app:tint="?attr/colorOnPrimaryContainer" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -61,14 +63,14 @@
                             android:text="@string/compartir_avisar_casa"
                             android:textSize="16sp"
                             android:textStyle="bold"
-                            android:textColor="@color/onPrimaryContainer" />
+                            android:textColor="?attr/colorOnPrimaryContainer" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/compartir_avisar_desc"
                             android:textSize="13sp"
-                            android:textColor="@color/onPrimaryContainer" />
+                            android:textColor="?attr/colorOnPrimaryContainer" />
 
                     </LinearLayout>
 

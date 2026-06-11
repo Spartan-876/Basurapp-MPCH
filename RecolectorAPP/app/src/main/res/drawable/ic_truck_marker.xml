@@ -8,43 +8,12 @@
     <path
         android:fillColor="#0d631b"
         android:pathData="M24,2C14.06,2 6,10.06 6,20c0,12 18,26 18,26s18,-14 18,-26C42,10.06 33.94,2 24,2z" />
-    <!-- Tacho de basura blanco -->
+    <!-- Campana blanca -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M18,14h12v12c0,2.2 -1.8,4 -4,4h-4c-2.2,0 -4,-1.8 -4,-4V14z" />
-    <!-- Tapadera del tacho -->
+        android:pathData="M24,10c-5.5,0 -10,4.5 -10,10v5c0,1 -0.4,2 -1,2.7l-1,1v1.3h22v-1.3l-1,-1c-0.6,-0.7 -1,-1.7 -1,-2.7v-5c0,-5.5 -4.5,-10 -10,-10zM20,27c0,2.2 1.8,4 4,4s4,-1.8 4,-4H20z" />
+    <!-- Colgante de la campana -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M16,13h16v2H16V13z" />
-    <!-- Asa del tacho -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M20,11h8v2h-8V11z" />
-    <!-- Líneas de reciclaje (símbolo simple) -->
-    <path
-        android:fillColor="#0d631b"
-        android:pathData="M24,18l-2,3h4l-2,3"
-        android:strokeColor="#0d631b"
-        android:strokeWidth="1.2" />
-    <path
-        android:fillColor="#0d631b"
-        android:pathData="M20,21l2,-1.5l2,1.5"
-        android:strokeColor="#0d631b"
-        android:strokeWidth="1.2" />
-    <path
-        android:fillColor="#0d631b"
-        android:pathData="M28,21l-2,-1.5l-2,1.5"
-        android:strokeColor="#0d631b"
-        android:strokeWidth="1.2" />
-    <!-- Ondas de alerta (arriba derecha) -->
-    <path
-        android:fillColor="@android:color/transparent"
-        android:strokeColor="#0d631b"
-        android:strokeWidth="1.8"
-        android:pathData="M33,8 Q37,12 33,16" />
-    <path
-        android:fillColor="@android:color/transparent"
-        android:strokeColor="#0d631b"
-        android:strokeWidth="1.4"
-        android:pathData="M36,6 Q41,12 36,18" />
+        android:pathData="M22,8h4v3h-4V8z" />
 </vector>

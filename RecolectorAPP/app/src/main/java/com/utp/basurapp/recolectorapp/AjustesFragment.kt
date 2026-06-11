@@ -6,9 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.utp.basurapp.recolectorapp.util.SessionManager
@@ -25,6 +26,12 @@ class AjustesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         sessionManager = SessionManager(requireContext())
+
+        ViewCompat.setOnApplyWindowInsetsListener(view.findViewById(R.id.titleAjustes)) { v, insets ->
+            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            v.setPadding(v.paddingLeft, statusBarHeight + 16, v.paddingRight, 20)
+            insets
+        }
 
         val nombre = sessionManager.getNombre()
         val email = sessionManager.getEmail()
@@ -49,9 +56,6 @@ class AjustesFragment : Fragment() {
             requireActivity().finish()
         }
 
-        view.findViewById<View>(R.id.switchVibration).setOnClickListener {
-            Toast.makeText(requireContext(), "Preferencia guardada", Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun mostrarSelectorTema() {

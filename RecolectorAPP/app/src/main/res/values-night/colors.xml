@@ -9,9 +9,9 @@
     <color name="onBackgroundNight">#FFE6E1E5</color>
     <color name="errorNight">#FFF2B8B5</color>
     <color name="onErrorNight">#FF601410</color>
-    <color name="secondaryNight">#FF8BC34A</color>
-    <color name="surfaceContainerLowNight">#FF1D1B20</color>
-    <color name="surfaceContainerNight">#FF211F26</color>
-    <color name="surfaceContainerHighNight">#FF2B2930</color>
-    <color name="surfaceContainerHighestNight">#FF36343B</color>
+    <color name="secondaryNight">#FFCCC2DC</color>
+    <color name="surfaceContainerLowNight">#FF211F26</color>
+    <color name="surfaceContainerNight">#FF2B2930</color>
+    <color name="surfaceContainerHighNight">#FF36343B</color>
+    <color name="surfaceContainerHighestNight">#FF48464C</color>
 </resources>

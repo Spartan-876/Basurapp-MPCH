@@ -13,6 +13,7 @@
         android:paddingHorizontal="20dp">
 
         <TextView
+            android:id="@+id/titleAjustes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -51,7 +52,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_person_outline"
-                    android:contentDescription="@string/settings_name" />
+                    android:contentDescription="@string/settings_name"
+                    app:tint="?attr/colorOnSurface" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -80,7 +82,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_chevron_right"
-                    android:contentDescription="Editar" />
+                    android:contentDescription="Editar"
+                    app:tint="?attr/colorOnSurface" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -104,7 +107,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_mail"
-                    android:contentDescription="@string/settings_email" />
+                    android:contentDescription="@string/settings_email"
+                    app:tint="?attr/colorOnSurface" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -133,7 +137,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_chevron_right"
-                    android:contentDescription="Editar" />
+                    android:contentDescription="Editar"
+                    app:tint="?attr/colorOnSurface" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -157,7 +162,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_lock"
-                    android:contentDescription="@string/settings_password" />
+                    android:contentDescription="@string/settings_password"
+                    app:tint="?attr/colorOnSurface" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -185,7 +191,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_chevron_right"
-                    android:contentDescription="Editar" />
+                    android:contentDescription="Editar"
+                    app:tint="?attr/colorOnSurface" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -209,7 +216,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_location_on"
-                    android:contentDescription="@string/settings_address" />
+                    android:contentDescription="@string/settings_address"
+                    app:tint="?attr/colorOnSurface" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -239,7 +247,8 @@
                     android:layout_height="32dp"
                     android:src="@drawable/ic_edit"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Editar" />
+                    android:contentDescription="Editar"
+                    app:tint="?attr/colorOnSurface" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -304,120 +313,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_chevron_right"
-                    android:contentDescription="Cambiar" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_notifications"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="?attr/colorPrimary"
-            android:layout_marginBottom="8dp" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-            app:strokeWidth="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_vibration"
-                    android:contentDescription="@string/settings_vibration" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_vibration"
-                        android:textSize="14sp"
-                        android:textColor="?attr/colorOnSurface" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_vibration_desc"
-                        android:textSize="12sp"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
-                </LinearLayout>
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switchVibration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-            app:strokeWidth="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_notifications_active"
-                    android:contentDescription="@string/settings_sound" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_sound"
-                        android:textSize="14sp"
-                        android:textColor="?attr/colorOnSurface" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_sound_default"
-                        android:textSize="12sp"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
-                </LinearLayout>
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_chevron_right"
-                    android:contentDescription="Cambiar" />
+                    android:contentDescription="Cambiar"
+                    app:tint="?attr/colorOnSurface" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

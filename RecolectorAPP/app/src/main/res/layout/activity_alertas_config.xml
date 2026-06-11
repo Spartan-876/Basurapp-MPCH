@@ -7,6 +7,7 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/headerConfig"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -69,7 +70,7 @@
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
                 app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                app:strokeColor="@color/outlineVariant"
+                app:strokeColor="?attr/colorOutlineVariant"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -84,7 +85,7 @@
                         android:layout_height="24dp"
                         android:src="@drawable/ic_location_on"
                         android:contentDescription="@string/settings_address"
-                        app:tint="@color/primary" />
+                        app:tint="?attr/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -109,45 +110,6 @@
                             android:textStyle="bold"
                             android:textColor="?attr/colorOnSurface" />
                     </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                app:strokeWidth="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_notifications_active"
-                        android:contentDescription="@string/alert_proximity_title" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:text="@string/alert_proximity_title"
-                        android:textSize="16sp"
-                        android:textColor="?attr/colorOnSurface" />
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/switchAlerts"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="true" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -221,7 +183,8 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_info"
-                        android:contentDescription="Info" />
+                        android:contentDescription="Info"
+                        app:tint="?attr/colorOnSurfaceVariant" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -350,7 +313,8 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/ic_volume_up"
-                        android:contentDescription="@string/alert_sound" />
+                        android:contentDescription="@string/alert_sound"
+                        app:tint="?attr/colorOnSurface" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -361,19 +325,11 @@
                         android:textSize="14sp"
                         android:textColor="?attr/colorOnSurface" />
 
-                    <TextView
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchSound"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/settings_sound_default"
-                        android:textSize="12sp"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:layout_marginEnd="8dp" />
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_chevron_right"
-                        android:contentDescription="Cambiar" />
+                        android:checked="true" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -397,7 +353,8 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/ic_vibration"
-                        android:contentDescription="@string/alert_vibration" />
+                        android:contentDescription="@string/alert_vibration"
+                        app:tint="?attr/colorOnSurface" />
 
                     <TextView
                         android:layout_width="0dp"

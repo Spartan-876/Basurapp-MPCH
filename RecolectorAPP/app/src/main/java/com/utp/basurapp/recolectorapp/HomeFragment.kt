@@ -17,16 +17,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.utp.basurapp.recolectorapp.api.RetrofitClient
 import com.utp.basurapp.recolectorapp.data.CamionResponse
 import com.utp.basurapp.recolectorapp.data.PerfilResponse
+import com.utp.basurapp.recolectorapp.util.NotificationHistoryManager
 import com.utp.basurapp.recolectorapp.util.SessionManager
 import org.maplibre.android.MapLibre
 import org.maplibre.android.WellKnownTileServer
@@ -88,6 +90,12 @@ class HomeFragment : Fragment() {
         }
 
         setupMap()
+
+        ViewCompat.setOnApplyWindowInsetsListener(view.findViewById(R.id.headerHome)) { v, insets ->
+            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            v.setPadding(v.paddingLeft, statusBarHeight + 12, v.paddingRight, 12)
+            insets
+        }
 
         view.findViewById<FloatingActionButton>(R.id.btnMiUbicacion).setOnClickListener {
             map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(miLat, miLon), 16.0))
@@ -295,6 +303,14 @@ class HomeFragment : Fragment() {
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             NotificationManagerCompat.from(requireContext()).notify(1001, builder.build())
         }
+
+        NotificationHistoryManager.guardar(
+            requireContext(),
+            "Camión Recolector cerca",
+            "El camión recolector está a $distancia. Prepara las bolsas de basura.",
+            "camion",
+            distancia
+        )
     }
 
     private fun drawableToBitmap(resId: Int): Bitmap {

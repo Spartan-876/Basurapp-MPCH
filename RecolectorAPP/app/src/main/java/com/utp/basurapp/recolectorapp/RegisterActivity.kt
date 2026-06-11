@@ -18,6 +18,7 @@ import com.google.android.gms.location.LocationServices
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.textfield.TextInputEditText
 import com.utp.basurapp.recolectorapp.api.RetrofitClient
 import com.utp.basurapp.recolectorapp.data.RegisterRequest
@@ -44,8 +45,8 @@ class RegisterActivity : AppCompatActivity() {
             locationSource = "map"
             val cardMap = findViewById<MaterialCardView>(R.id.cardLocationMap)
             val cardGps = findViewById<MaterialCardView>(R.id.cardLocationGps)
-            cardMap.strokeColor = ContextCompat.getColor(this, R.color.primary)
-            cardGps.strokeColor = ContextCompat.getColor(this, R.color.outlineVariant)
+            cardMap.strokeColor = 0xFF2E7D32.toInt()
+            cardGps.strokeColor = 0xFFCAC4D0.toInt()
             if (selectedLat != null && selectedLon != null) {
                 GeocodingService.obtenerDireccion(selectedLat!!, selectedLon!!) { dir ->
                     direccionSeleccionada = dir ?: ""
@@ -84,8 +85,8 @@ class RegisterActivity : AppCompatActivity() {
                 selectedLat = lat
                 selectedLon = lon
                 locationSource = "gps"
-                cardGps.strokeColor = ContextCompat.getColor(this, R.color.primary)
-                cardMap.strokeColor = ContextCompat.getColor(this, R.color.outlineVariant)
+                cardGps.strokeColor = 0xFF2E7D32.toInt()
+                cardMap.strokeColor = 0xFFCAC4D0.toInt()
                 Toast.makeText(this, R.string.ubicacion_capturada, Toast.LENGTH_SHORT).show()
                 GeocodingService.obtenerDireccion(lat, lon) { dir ->
                     direccionSeleccionada = dir ?: ""

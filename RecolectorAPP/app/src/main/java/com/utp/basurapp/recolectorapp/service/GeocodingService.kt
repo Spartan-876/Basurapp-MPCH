@@ -42,7 +42,24 @@ object GeocodingService {
                     response: retrofit2.Response<NominatimResponse>
                 ) {
                     if (response.isSuccessful) {
-                        callback(response.body()?.display_name)
+                        val body = response.body()
+                        val addr = body?.address
+                        val street = addr?.road
+                        val number = addr?.house_number
+                        val city = addr?.city ?: addr?.town ?: addr?.village
+
+                        val result = when {
+                            street != null && city != null -> {
+                                val base = if (number != null) "$street $number, $city" else "$street, $city"
+                                if (!base.contains("Chiclayo", ignoreCase = true)) "$base, Chiclayo" else base
+                            }
+                            street != null -> {
+                                val base = if (number != null) "$street $number" else street
+                                "$base, Chiclayo"
+                            }
+                            else -> body?.display_name
+                        }
+                        callback(result)
                     } else {
                         callback(null)
                     }

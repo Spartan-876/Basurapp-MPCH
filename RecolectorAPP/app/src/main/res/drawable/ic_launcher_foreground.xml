@@ -1,24 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <!-- Tacho de basura blanco centrado en safe zone (66dp centrado en 108dp = de 21 a 87) -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M44,32h20v24c0,3.3 -2.7,6 -6,6h-8c-3.3,0 -6,-2.7 -6,-6V32z" />
-    <!-- Tapadera -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M41,30h26v3H41V30z" />
-    <!-- Asa -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M47,27h14v3H47V27z" />
-    <!-- Líneas decorativas -->
-    <path
-        android:strokeColor="#2E7D32"
-        android:strokeWidth="1.5"
-        android:pathData="M48,36v14M54,36v14M60,36v14" />
-</vector>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:gravity="center"
+        android:width="64dp"
+        android:height="64dp">
+        <bitmap
+            android:src="@drawable/ic_logo_stitch_64x64"
+            android:gravity="center" />
+    </item>
+</layer-list>
