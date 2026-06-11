@@ -10,9 +10,6 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ApiService {
-    @POST("api/usuarios/registrar")
-    fun registrarUsuario(@Body request: UsuarioRequest): Call<ApiResponse>
-
     @POST("api/auth/login")
     fun login(@Body request: LoginRequest): Call<AuthResponse>
 

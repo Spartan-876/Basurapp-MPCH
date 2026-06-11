@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Basurapp</string>
-    <string name="app_tagline">Gestión cívica inteligente</string>
-    <string name="app_tagline_sub">Conectando comunidades para un entorno más limpio</string>
     <string name="app_tagline_login">Gestión cívica para una ciudad más limpia</string>
 
-    <string name="title_login">Iniciar Sesión</string>
     <string name="btn_login">Acceder a mi cuenta</string>
     <string name="btn_register">Crear cuenta</string>
     <string name="btn_send_report">Enviar reporte</string>
@@ -16,8 +13,6 @@
     <string name="hint_confirm_password">Confirmar contraseña</string>
     <string name="link_forgot_password">¿Olvidaste tu contraseña?</string>
     <string name="link_register">¿No tienes cuenta? Regístrate aquí</string>
-    <string name="link_register_simple">¿No tienes cuenta? Regístrate</string>
-    <string name="link_login">¿Ya tienes cuenta? Inicia sesión</string>
     <string name="register_title">Crear cuenta</string>
     <string name="register_subtitle">Únete a Basurapp y mejora tu comunidad.</string>
     <string name="location_title">¿Qué ubicación deseas registrar?</string>
@@ -40,8 +35,6 @@
     <string name="schedule_label">Horario de recolección de la zona</string>
     <string name="arrival_time">Aprox. en tu domicilio</string>
     <string name="swipe_up_info">Desliza hacia arriba para más info</string>
-    <string name="on_route">En ruta</string>
-    <string name="nearby">Cercano</string>
     <string name="share_alert">Compartir alerta</string>
 
     <string name="tab_home">Inicio</string>
@@ -83,7 +76,6 @@
     <string name="alert_days_hint">Selecciona los días que deseas recibir avisos basados en tu ruta.</string>
     <string name="alert_sound">Sonido de Notificación</string>
     <string name="alert_vibration">Vibración</string>
-    <string name="distance_unit">m</string>
     <string name="distance_100">100m</string>
     <string name="distance_2km">2km</string>
 
@@ -95,7 +87,6 @@
     <string name="sat">S</string>
     <string name="sun">D</string>
 
-    <string name="estado_pendiente">Estado: Pendiente</string>
     <string name="mensaje_whatsapp">El camión recolector está cerca. Saca la basura de tu casa.</string>
     <string name="whatsapp_not_installed">WhatsApp no está instalado</string>
     <string name="sms_not_available">No se puede enviar SMS</string>
@@ -128,14 +119,4 @@
     <string name="ubicacion_capturada">Ubicación capturada correctamente</string>
     <string name="gps_no_disponible">No se pudo obtener la ubicación. Activa el GPS.</string>
     <string name="gps_error">Error al obtener ubicación</string>
-
-    <string name="notifications_title">Notificaciones</string>
-    <string name="centrar_ubicacion">Mi ubicación</string>
-    <string name="compartir_alerta">Compartir alerta</string>
-    <string name="zona_chiclayo">Chiclayo</string>
-    <string name="camion_cerca_titulo">¡Camión recolector cerca!</string>
-    <string name="camion_cerca_mensaje">El recolector está por tu zona. Saca la basura de tu casa.</string>
-    <string name="canal_alertas">Alertas Basurapp</string>
-    <string name="ubicacion_fuera_distrito">Tu ubicación debe estar dentro del distrito de Chiclayo</string>
-    <string name="proximoamente">Próximamente</string>
 </resources>

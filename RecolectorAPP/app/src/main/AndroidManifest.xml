@@ -38,10 +38,6 @@
             android:exported="false" />
 
         <activity
-            android:name=".MapaActivity"
-            android:exported="false" />
-
-        <activity
             android:name=".AlertasConfigActivity"
             android:exported="false" />
 
