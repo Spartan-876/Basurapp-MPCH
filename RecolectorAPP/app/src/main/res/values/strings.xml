@@ -36,6 +36,9 @@
     <string name="arrival_time">Aprox. en tu domicilio</string>
     <string name="swipe_up_info">Desliza hacia arriba para más info</string>
     <string name="share_alert">Compartir alerta</string>
+    <string name="truck_label">Camión Recolector</string>
+    <string name="truck_distance">Calculando...</string>
+    <string name="truck_no_data">Sin datos</string>
 
     <string name="tab_home">Inicio</string>
     <string name="tab_history">Historial</string>

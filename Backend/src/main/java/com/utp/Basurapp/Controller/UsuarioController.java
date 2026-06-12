@@ -72,7 +72,7 @@ public class UsuarioController {
 
         if (usuario.getUbicacionCasa() != null) {
             response.put("latitud", usuario.getUbicacionCasa().getY());
-            response.put("longitud", usuario.getUbicacionCasa().getX());
+            response.put("longitud", usuario.getUbicacionCasa().getX());    
         }
 
         if (usuario.getDistrito() != null) {
