@@ -3,12 +3,7 @@ package com.utp.Basurapp.app.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.URI;
-import java.time.Duration;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,9 +13,7 @@ public class CamionAlertScheduler {
 
     private final AlertaService alertaService;
     private final String servidorRutasUrl;
-    private final HttpClient httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(3))
-            .build();
+    private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public CamionAlertScheduler(AlertaService alertaService,
@@ -32,16 +25,10 @@ public class CamionAlertScheduler {
     @Scheduled(fixedRate = 15000)
     public void verificarProximidadCamiones() {
         try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(servidorRutasUrl + "/api/camiones"))
-                    .timeout(Duration.ofSeconds(5))
-                    .GET()
-                    .build();
+            String response = restTemplate.getForObject(servidorRutasUrl + "/api/camiones", String.class);
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
-                JsonNode camiones = objectMapper.readTree(response.body());
+            if (response != null) {
+                JsonNode camiones = objectMapper.readTree(response);
 
                 if (camiones.isArray()) {
                     for (JsonNode camion : camiones) {

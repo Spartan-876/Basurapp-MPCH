@@ -1,16 +1,11 @@
 package com.utp.Basurapp.admin.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utp.Basurapp.admin.dto.CamionEstadoRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.URI;
-import java.time.Duration;
 import java.util.Map;
 
 @RestController
@@ -18,10 +13,7 @@ import java.util.Map;
 public class AdminCamionController {
 
     private final String servidorRutasUrl;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final HttpClient httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(3))
-            .build();
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public AdminCamionController(@Value("${app.servidor-rutas.url}") String servidorRutasUrl) {
         this.servidorRutasUrl = servidorRutasUrl;
@@ -30,21 +22,10 @@ public class AdminCamionController {
     @GetMapping
     public ResponseEntity<?> listarCamiones() {
         try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(servidorRutasUrl + "/api/camiones"))
-                    .timeout(Duration.ofSeconds(5))
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
-                Object json = objectMapper.readValue(response.body(), Object.class);
-                return ResponseEntity.ok(json);
-            } else {
-                return ResponseEntity.status(response.statusCode()).body(response.body());
-            }
+            Object result = restTemplate.getForObject(servidorRutasUrl + "/api/camiones", Object.class);
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
+            System.err.println("[AdminCamionController] ERROR: " + e.getMessage());
             return ResponseEntity.ok("[]");
         }
     }
@@ -52,16 +33,8 @@ public class AdminCamionController {
     @PutMapping("/{idCamion}/estado")
     public ResponseEntity<?> cambiarEstado(@PathVariable String idCamion, @RequestBody CamionEstadoRequest request) {
         try {
-            String json = "{\"activo\":" + request.isActivo() + "}";
-            HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(servidorRutasUrl + "/api/camion/" + idCamion + "/estado"))
-                    .timeout(Duration.ofSeconds(5))
-                    .header("Content-Type", "application/json")
-                    .PUT(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
+            Map<String, Object> body = Map.of("activo", request.isActivo());
+            restTemplate.put(servidorRutasUrl + "/api/camion/" + idCamion + "/estado", body);
             return ResponseEntity.ok(Map.of(
                     "idCamion", idCamion,
                     "activo", request.isActivo(),

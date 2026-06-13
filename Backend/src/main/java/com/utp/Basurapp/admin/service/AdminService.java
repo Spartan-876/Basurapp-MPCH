@@ -9,6 +9,7 @@ import com.utp.Basurapp.common.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ public class AdminService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final String servidorRutasUrl;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public AdminService(AdminRepository adminRepository,
                         UsuarioRepository usuarioRepository,
@@ -100,32 +102,27 @@ public class AdminService {
 
     public void enviarAlertaPorCamion(String idCamion, String placa, String mensaje, double radioMetros) {
         try {
-            java.net.http.HttpClient httpClient = java.net.http.HttpClient.newBuilder()
-                    .connectTimeout(java.time.Duration.ofSeconds(3))
-                    .build();
+            Object result = restTemplate.getForObject(
+                    servidorRutasUrl + "/api/camion/" + idCamion + "/ubicacion", Object.class);
 
-            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
-                    .uri(java.net.URI.create(servidorRutasUrl + "/api/camion/" + idCamion + "/ubicacion"))
-                    .timeout(java.time.Duration.ofSeconds(5))
-                    .GET()
-                    .build();
+            if (result instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> json = (Map<String, Object>) result;
+                @SuppressWarnings("unchecked")
+                Map<String, Object> coordenadas = (Map<String, Object>) json.get("coordenadas");
 
-            java.net.http.HttpResponse<String> response = httpClient.send(request,
-                    java.net.http.HttpResponse.BodyHandlers.ofString());
+                if (coordenadas != null) {
+                    double lat = ((Number) coordenadas.getOrDefault("latitud", 0)).doubleValue();
+                    double lon = ((Number) coordenadas.getOrDefault("longitud", 0)).doubleValue();
 
-            if (response.statusCode() == 200) {
-                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                com.fasterxml.jackson.databind.JsonNode json = mapper.readTree(response.body());
-                double lat = json.path("coordenadas").path("latitud").asDouble();
-                double lon = json.path("coordenadas").path("longitud").asDouble();
+                    if (lat != 0.0 && lon != 0.0) {
+                        List<com.utp.Basurapp.common.model.Usuario> usuariosCerca =
+                                usuarioRepository.encontrarUsuariosEnRadio(lat, lon, radioMetros);
 
-                if (lat != 0.0 && lon != 0.0) {
-                    List<com.utp.Basurapp.common.model.Usuario> usuariosCerca =
-                            usuarioRepository.encontrarUsuariosEnRadio(lat, lon, radioMetros);
-
-                    for (com.utp.Basurapp.common.model.Usuario usuario : usuariosCerca) {
-                        if (usuario.getFcmToken() != null && !usuario.getFcmToken().isEmpty()) {
-                            enviarNotificacionFirebase(usuario.getFcmToken(), "Alerta " + placa, mensaje);
+                        for (com.utp.Basurapp.common.model.Usuario usuario : usuariosCerca) {
+                            if (usuario.getFcmToken() != null && !usuario.getFcmToken().isEmpty()) {
+                                enviarNotificacionFirebase(usuario.getFcmToken(), "Alerta " + placa, mensaje);
+                            }
                         }
                     }
                 }
