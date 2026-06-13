@@ -1,6 +1,8 @@
 package com.utp.Basurapp.admin.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utp.Basurapp.admin.dto.CamionEstadoRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,16 +17,21 @@ import java.util.Map;
 @RequestMapping("/api/admin/camiones")
 public class AdminCamionController {
 
-    private static final String SERVIDOR_RUTAS_BASE = "http://localhost:3001";
+    private final String servidorRutasUrl;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(3))
             .build();
+
+    public AdminCamionController(@Value("${app.servidor-rutas.url}") String servidorRutasUrl) {
+        this.servidorRutasUrl = servidorRutasUrl;
+    }
 
     @GetMapping
     public ResponseEntity<?> listarCamiones() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(SERVIDOR_RUTAS_BASE + "/api/camiones"))
+                    .uri(URI.create(servidorRutasUrl + "/api/camiones"))
                     .timeout(Duration.ofSeconds(5))
                     .GET()
                     .build();
@@ -32,7 +39,8 @@ public class AdminCamionController {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                return ResponseEntity.ok(response.body());
+                Object json = objectMapper.readValue(response.body(), Object.class);
+                return ResponseEntity.ok(json);
             } else {
                 return ResponseEntity.status(response.statusCode()).body(response.body());
             }
@@ -46,7 +54,7 @@ public class AdminCamionController {
         try {
             String json = "{\"activo\":" + request.isActivo() + "}";
             HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(SERVIDOR_RUTAS_BASE + "/api/camion/" + idCamion + "/estado"))
+                    .uri(URI.create(servidorRutasUrl + "/api/camion/" + idCamion + "/estado"))
                     .timeout(Duration.ofSeconds(5))
                     .header("Content-Type", "application/json")
                     .PUT(HttpRequest.BodyPublishers.ofString(json))

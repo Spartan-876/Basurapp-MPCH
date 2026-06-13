@@ -6,6 +6,7 @@ import com.google.firebase.messaging.Notification;
 import com.utp.Basurapp.common.model.Admin;
 import com.utp.Basurapp.common.repository.AdminRepository;
 import com.utp.Basurapp.common.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +19,16 @@ public class AdminService {
     private final AdminRepository adminRepository;
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final String servidorRutasUrl;
 
     public AdminService(AdminRepository adminRepository,
                         UsuarioRepository usuarioRepository,
-                        PasswordEncoder passwordEncoder) {
+                        PasswordEncoder passwordEncoder,
+                        @Value("${app.servidor-rutas.url}") String servidorRutasUrl) {
         this.adminRepository = adminRepository;
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+        this.servidorRutasUrl = servidorRutasUrl;
     }
 
     public Admin login(String email, String password) {
@@ -101,7 +105,7 @@ public class AdminService {
                     .build();
 
             java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
-                    .uri(java.net.URI.create("http://localhost:3001/api/camion/" + idCamion + "/ubicacion"))
+                    .uri(java.net.URI.create(servidorRutasUrl + "/api/camion/" + idCamion + "/ubicacion"))
                     .timeout(java.time.Duration.ofSeconds(5))
                     .GET()
                     .build();

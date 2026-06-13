@@ -1,5 +1,6 @@
 package com.utp.Basurapp.app.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -15,22 +16,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 public class CamionAlertScheduler {
 
-    private static final String SERVIDOR_RUTAS_URL = "http://localhost:3001/api/camiones";
     private final AlertaService alertaService;
+    private final String servidorRutasUrl;
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(3))
             .build();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public CamionAlertScheduler(AlertaService alertaService) {
+    public CamionAlertScheduler(AlertaService alertaService,
+                                 @Value("${app.servidor-rutas.url}") String servidorRutasUrl) {
         this.alertaService = alertaService;
+        this.servidorRutasUrl = servidorRutasUrl;
     }
 
     @Scheduled(fixedRate = 15000)
     public void verificarProximidadCamiones() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(SERVIDOR_RUTAS_URL))
+                    .uri(URI.create(servidorRutasUrl + "/api/camiones"))
                     .timeout(Duration.ofSeconds(5))
                     .GET()
                     .build();

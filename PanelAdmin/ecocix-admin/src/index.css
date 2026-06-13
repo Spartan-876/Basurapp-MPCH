@@ -1,3 +1,14 @@
-/* === EcoCix Admin — Minimal residual styles === */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', 'Plus Jakarta Sans', 'Roboto', sans-serif; }
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--mui-typography-fontFamily, 'Inter', 'Plus Jakarta Sans', sans-serif);
+  background-color: var(--mui-palette-background-default, #FAFAFA);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

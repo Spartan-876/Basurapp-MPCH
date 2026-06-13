@@ -112,7 +112,7 @@ export default function AlertasPage() {
             <Button
               fullWidth variant="contained" type="submit" size="large" sx={{ mt: 3 }}
               disabled={mutation.isPending || !mensaje}
-              startIcon={mutation.isPending ? <CircularProgress size={20} /> : <SendIcon />}
+              startIcon={mutation.isPending ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
             >
               {mutation.isPending ? 'Enviando...' : 'Enviar Alerta'}
             </Button>

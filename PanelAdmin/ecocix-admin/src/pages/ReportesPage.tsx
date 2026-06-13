@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Box, Typography, CircularProgress, Alert, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Paper, Chip, Select, MenuItem, FormControl,
+  TableContainer, TableHead, TableRow, Chip, Select, MenuItem, FormControl,
 } from '@mui/material';
 import { adminService } from '../services/api';
 import type { Reporte } from '../types';
@@ -39,17 +39,17 @@ export default function ReportesPage() {
   return (
     <Box>
       <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>Reportes ({reportes.length})</Typography>
-      <TableContainer component={Paper}>
+      <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>ID</TableCell>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Ciudadano</TableCell>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Descripción</TableCell>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Ubicación</TableCell>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Fecha</TableCell>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Estado</TableCell>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Acción</TableCell>
+              <TableCell>ID</TableCell>
+              <TableCell>Ciudadano</TableCell>
+              <TableCell>Descripción</TableCell>
+              <TableCell>Ubicación</TableCell>
+              <TableCell>Fecha</TableCell>
+              <TableCell>Estado</TableCell>
+              <TableCell>Acción</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Box, Typography, CircularProgress, Alert, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Paper, Chip, Button, TextField,
+  TableContainer, TableHead, TableRow, Chip, Button, TextField,
   Card, CardContent, Dialog, DialogTitle, DialogContent, DialogActions,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -89,15 +89,15 @@ export default function AdminUsersPage() {
         </Card>
       )}
 
-      <TableContainer component={Paper}>
+      <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Nombre</TableCell>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Email</TableCell>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Estado</TableCell>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Fecha de creación</TableCell>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Acción</TableCell>
+              <TableCell>Nombre</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Estado</TableCell>
+              <TableCell>Fecha de creación</TableCell>
+              <TableCell>Acción</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

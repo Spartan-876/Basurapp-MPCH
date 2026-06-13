@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Box, Typography, Card, CardContent, CircularProgress, Alert,
-  Chip, Button, Grid,
+  Chip, Button, Grid, Avatar, useTheme, alpha,
 } from '@mui/material';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -10,6 +10,7 @@ import type { Camion } from '../types';
 
 export default function CamionesPage() {
   const queryClient = useQueryClient();
+  const theme = useTheme();
 
   const { data: camiones = [], isLoading, error } = useQuery({
     queryKey: ['camiones'],
@@ -33,13 +34,28 @@ export default function CamionesPage() {
   return (
     <Box>
       <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>Camiones</Typography>
-      <Grid container spacing={2}>
+      <Grid container spacing={2.5}>
         {camiones.map((c: Camion) => (
           <Grid size={{ xs: 12, sm: 6, md: 4 }} key={c.idCamion}>
-            <Card sx={{ opacity: c.activo ? 1 : 0.6 }}>
+            <Card
+              sx={{
+                opacity: c.activo ? 1 : 0.6,
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 6px 24px rgba(0,0,0,0.1)' },
+              }}
+            >
               <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                  <LocalShippingIcon sx={{ fontSize: 36, color: 'primary.main' }} />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                  <Avatar
+                    sx={{
+                      bgcolor: alpha(theme.palette.primary.main, 0.1),
+                      color: 'primary.main',
+                      width: 48,
+                      height: 48,
+                    }}
+                  >
+                    <LocalShippingIcon />
+                  </Avatar>
                   <Chip
                     label={c.activo ? 'Activo' : 'Inactivo'}
                     color={c.activo ? 'success' : 'error'}
@@ -49,7 +65,7 @@ export default function CamionesPage() {
                 <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{c.idCamion}</Typography>
                 <Typography variant="body2" color="text.secondary">Placa: {c.placa}</Typography>
                 {c.coordenadas && (
-                  <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace', mt: 0.5 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace', fontSize: 12, mt: 0.5 }}>
                     <LocationOnIcon sx={{ fontSize: 14, verticalAlign: 'middle', mr: 0.5 }} />
                     {c.coordenadas.latitud.toFixed(4)}, {c.coordenadas.longitud.toFixed(4)}
                   </Typography>
@@ -60,7 +76,7 @@ export default function CamionesPage() {
                 <Button
                   fullWidth variant="contained" size="small"
                   color={c.activo ? 'error' : 'success'}
-                  sx={{ mt: 1.5 }}
+                  sx={{ mt: 2 }}
                   disabled={toggleMutation.isPending}
                   onClick={() => toggleMutation.mutate({ idCamion: c.idCamion, activo: !c.activo })}
                 >

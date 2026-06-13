@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import {
   Box, Typography, CircularProgress, Alert, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Paper,
+  TableContainer, TableHead, TableRow,
 } from '@mui/material';
 import { adminService } from '../services/api';
 
@@ -24,14 +24,14 @@ export default function CiudadanosPage() {
       <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>
         Ciudadanos registrados ({ciudadanos.length})
       </Typography>
-      <TableContainer component={Paper}>
+      <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Nombre</TableCell>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Email</TableCell>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Dirección</TableCell>
-              <TableCell sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 12 }}>Registro</TableCell>
+              <TableCell>Nombre</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Dirección</TableCell>
+              <TableCell>Registro</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

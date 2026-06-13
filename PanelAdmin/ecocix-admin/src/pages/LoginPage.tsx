@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  Box, Card, CardContent, TextField, Button, Typography, Alert, CircularProgress, Avatar,
+  Box, Card, CardContent, TextField, Button, Typography, Alert, CircularProgress, Avatar, useTheme, alpha,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import GrassIcon from '@mui/icons-material/Grass';
@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,14 +31,28 @@ export default function LoginPage() {
   };
 
   return (
-    <Box sx={{
-      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'linear-gradient(135deg, #e8f5e9, #f5f5f5)',
-    }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: `linear-gradient(135deg, ${theme.palette.grey[100]}, ${theme.palette.background.default})`,
+      }}
+    >
       <Card sx={{ width: '100%', maxWidth: 420, mx: 2 }}>
         <CardContent sx={{ p: 4 }}>
           <Box sx={{ textAlign: 'center', mb: 3 }}>
-            <Avatar sx={{ bgcolor: 'primary.main', width: 72, height: 72, mx: 'auto', mb: 2 }}>
+            <Avatar
+              sx={{
+                bgcolor: 'primary.main',
+                width: 72,
+                height: 72,
+                mx: 'auto',
+                mb: 2,
+                boxShadow: `0 4px 24px ${alpha(theme.palette.primary.main, 0.3)}`,
+              }}
+            >
               <GrassIcon sx={{ fontSize: 40 }} />
             </Avatar>
             <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main' }}>
@@ -65,7 +80,7 @@ export default function LoginPage() {
             <Button
               fullWidth variant="contained" type="submit" size="large"
               disabled={loading} sx={{ mt: 3, py: 1.5 }}
-              startIcon={loading ? <CircularProgress size={20} /> : <LockOutlinedIcon />}
+              startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <LockOutlinedIcon />}
             >
               {loading ? 'Ingresando...' : 'Iniciar Sesión'}
             </Button>

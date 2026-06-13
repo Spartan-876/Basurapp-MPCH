@@ -1,5 +1,7 @@
 package com.utp.Basurapp.app.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,16 +19,21 @@ import java.util.Map;
 @RequestMapping("/api")
 public class CamionController {
 
-    private static final String SERVIDOR_RUTAS_BASE = "http://localhost:3001";
+    private final String servidorRutasUrl;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(3))
             .build();
+
+    public CamionController(@Value("${app.servidor-rutas.url}") String servidorRutasUrl) {
+        this.servidorRutasUrl = servidorRutasUrl;
+    }
 
     @GetMapping("/camiones")
     public ResponseEntity<?> listarCamiones() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(SERVIDOR_RUTAS_BASE + "/api/camiones"))
+                    .uri(URI.create(servidorRutasUrl + "/api/camiones"))
                     .timeout(Duration.ofSeconds(5))
                     .GET()
                     .build();
@@ -34,7 +41,8 @@ public class CamionController {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                return ResponseEntity.ok(response.body());
+                Object json = objectMapper.readValue(response.body(), Object.class);
+                return ResponseEntity.ok(json);
             } else {
                 return ResponseEntity.status(response.statusCode()).body(response.body());
             }
@@ -47,7 +55,7 @@ public class CamionController {
     public ResponseEntity<?> obtenerUbicacionCamion(@PathVariable String idCamion) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(SERVIDOR_RUTAS_BASE + "/api/camion/" + idCamion + "/ubicacion"))
+                    .uri(URI.create(servidorRutasUrl + "/api/camion/" + idCamion + "/ubicacion"))
                     .timeout(Duration.ofSeconds(5))
                     .GET()
                     .build();
@@ -55,7 +63,8 @@ public class CamionController {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                return ResponseEntity.ok(response.body());
+                Object json = objectMapper.readValue(response.body(), Object.class);
+                return ResponseEntity.ok(json);
             } else {
                 return ResponseEntity.status(response.statusCode()).body(response.body());
             }
@@ -72,7 +81,7 @@ public class CamionController {
     public ResponseEntity<?> obtenerUbicacion() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(SERVIDOR_RUTAS_BASE + "/api/camion/ubicacion-actual"))
+                    .uri(URI.create(servidorRutasUrl + "/api/camion/ubicacion-actual"))
                     .timeout(Duration.ofSeconds(5))
                     .GET()
                     .build();
@@ -80,7 +89,8 @@ public class CamionController {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                return ResponseEntity.ok(response.body());
+                Object json = objectMapper.readValue(response.body(), Object.class);
+                return ResponseEntity.ok(json);
             } else {
                 return ResponseEntity.status(response.statusCode()).body(response.body());
             }
