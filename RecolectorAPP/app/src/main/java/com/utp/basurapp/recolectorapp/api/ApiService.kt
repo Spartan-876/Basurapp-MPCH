@@ -1,13 +1,10 @@
 package com.utp.basurapp.recolectorapp.api
 
 import com.utp.basurapp.recolectorapp.data.*
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Path
+import retrofit2.http.*
 
 interface ApiService {
     @POST("api/auth/login")
@@ -21,6 +18,9 @@ interface ApiService {
 
     @GET("api/usuarios/perfil")
     fun obtenerPerfil(): Call<PerfilResponse>
+
+    @GET("api/camiones")
+    fun getCamiones(): Call<List<CamionResponse>>
 
     @GET("api/camion/ubicacion")
     fun getCamionUbicacion(): Call<CamionResponse>
@@ -39,4 +39,20 @@ interface ApiService {
 
     @PUT("api/usuarios/direccion")
     fun actualizarDireccion(@Body request: DireccionRequest): Call<ApiResponse>
+
+    @PUT("api/usuarios/ubicacion")
+    fun actualizarUbicacion(@Body request: ActualizarUbicacionRequest): Call<ApiResponse>
+
+    @Multipart
+    @POST("api/reportes")
+    fun enviarReporte(
+        @Part file: MultipartBody.Part,
+        @Part("descripcion") descripcion: RequestBody,
+        @Part("latitud") latitud: RequestBody,
+        @Part("longitud") longitud: RequestBody,
+        @Part("direccion") direccion: RequestBody
+    ): Call<ReporteResponse>
+
+    @GET("api/reportes")
+    fun listarReportes(): Call<List<ReporteResponse>>
 }

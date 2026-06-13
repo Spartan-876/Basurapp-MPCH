@@ -2,8 +2,10 @@ package com.utp.Basurapp.Controller;
 
 import com.utp.Basurapp.dto.FamiliarDTO;
 import com.utp.Basurapp.dto.UsuarioDTO;
+import com.utp.Basurapp.Model.Distrito;
 import com.utp.Basurapp.Model.Familiar;
 import com.utp.Basurapp.Model.Usuario;
+import com.utp.Basurapp.Repository.DistritoRepository;
 import com.utp.Basurapp.Repository.FamiliarRepository;
 import com.utp.Basurapp.Repository.UsuarioRepository;
 import org.locationtech.jts.geom.Coordinate;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -23,14 +26,17 @@ public class UsuarioController {
 
     private final UsuarioRepository usuarioRepository;
     private final FamiliarRepository familiarRepository;
+    private final DistritoRepository distritoRepository;
     private final PasswordEncoder passwordEncoder;
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
     public UsuarioController(UsuarioRepository usuarioRepository,
             FamiliarRepository familiarRepository,
+            DistritoRepository distritoRepository,
             PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.familiarRepository = familiarRepository;
+        this.distritoRepository = distritoRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -114,6 +120,52 @@ public class UsuarioController {
         usuarioRepository.save(usuario);
 
         return ResponseEntity.ok(Map.of("message", "Direccion actualizada", "direccion", direccion.trim()));
+    }
+
+    @PutMapping("/ubicacion")
+    public ResponseEntity<?> actualizarUbicacion(@RequestBody Map<String, Object> body, Authentication auth) {
+        String email = auth.getName();
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Double lat = null;
+        Double lon = null;
+        if (body.containsKey("latitud") && body.containsKey("longitud")) {
+            try {
+                lat = Double.parseDouble(body.get("latitud").toString());
+                lon = Double.parseDouble(body.get("longitud").toString());
+            } catch (NumberFormatException e) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Coordenadas invalidas"));
+            }
+        }
+
+        if (lat == null || lon == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "latitud y longitud son obligatorias"));
+        }
+
+        Optional<Distrito> distritoOpt = distritoRepository.encontrarDistritoQueContiene(lat, lon);
+        if (distritoOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error",
+                    "La ubicacion seleccionada esta fuera del distrito de Chiclayo."));
+        }
+
+        Point punto = geometryFactory.createPoint(new Coordinate(lon, lat));
+        punto.setSRID(4326);
+        usuario.setUbicacionCasa(punto);
+        usuario.setDistrito(distritoOpt.get());
+
+        if (body.containsKey("direccion") && body.get("direccion") != null) {
+            usuario.setDireccionRegistrada(body.get("direccion").toString().trim());
+        }
+
+        usuarioRepository.save(usuario);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Ubicacion actualizada",
+                "latitud", lat,
+                "longitud", lon,
+                "direccion", usuario.getDireccionRegistrada() != null ? usuario.getDireccionRegistrada() : ""
+        ));
     }
 
     @GetMapping("/familiares")

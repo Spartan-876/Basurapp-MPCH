@@ -37,16 +37,6 @@
             android:textStyle="bold"
             android:textColor="?attr/colorPrimary" />
 
-        <ImageButton
-            android:id="@+id/btnNotifications"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_notifications"
-            android:scaleType="centerInside"
-            android:contentDescription="@string/alerts_title"
-            app:tint="?attr/colorOnSurfaceVariant" />
-
     </LinearLayout>
 
     <!-- Map container -->
@@ -56,7 +46,9 @@
         android:id="@+id/mapContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="0dp" />
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="10dp"
+        />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardServicioNormal"
@@ -65,48 +57,49 @@
         android:layout_gravity="top|start"
         android:layout_marginStart="16dp"
         android:layout_marginTop="96dp"
+        android:layout_marginBottom="10dp"
+        app:cardBackgroundColor="?attr/colorSurface"
         app:cardCornerRadius="12dp"
         app:cardElevation="4dp"
-        app:strokeColor="?attr/colorOutlineVariant"
-        app:strokeWidth="1dp"
         app:contentPadding="12dp"
-        app:cardBackgroundColor="?attr/colorSurface">
+        app:strokeColor="?attr/colorOutlineVariant"
+        app:strokeWidth="1dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_check_circle"
+                android:contentDescription="@string/service_normal"
                 android:scaleType="centerInside"
-                app:tint="?attr/colorPrimary"
-                android:contentDescription="@string/service_normal" />
+                android:src="@drawable/ic_check_circle"
+                app:tint="?attr/colorPrimary" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginStart="8dp">
+                android:layout_marginStart="8dp"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/service_normal"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvZona"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/zone_label"
-                    android:textSize="12sp"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
@@ -146,7 +139,7 @@
         app:elevation="6dp"
         app:borderWidth="0dp" />
 
-    <!-- Card: Distancia al camion -->
+    <!-- Card: Distancia al camion mas cercano -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardCamionDistancia"
         android:layout_width="wrap_content"
@@ -197,6 +190,14 @@
                     android:text="@string/truck_distance"
                     android:textSize="12sp"
                     android:textColor="?attr/colorOnSurfaceVariant" />
+
+                <TextView
+                    android:id="@+id/tvTrucksActivos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="?attr/colorPrimary"
+                    android:visibility="gone" />
 
             </LinearLayout>
 

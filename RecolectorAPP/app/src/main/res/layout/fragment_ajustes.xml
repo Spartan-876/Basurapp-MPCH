@@ -243,11 +243,12 @@
                 </LinearLayout>
 
                 <ImageButton
+                    android:id="@+id/btnEditAddress"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@drawable/ic_edit"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Editar"
+                    android:contentDescription="Editar ubicacion"
                     app:tint="?attr/colorOnSurface" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

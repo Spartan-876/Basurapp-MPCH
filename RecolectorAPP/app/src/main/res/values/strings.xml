@@ -39,6 +39,10 @@
     <string name="truck_label">Camión Recolector</string>
     <string name="truck_distance">Calculando...</string>
     <string name="truck_no_data">Sin datos</string>
+    <string name="truck_active">Activo</string>
+    <string name="truck_inactive">Inactivo</string>
+    <string name="trucks_active_count">%d camiones activos</string>
+    <string name="truck_nearest">Más cercano</string>
 
     <string name="tab_home">Inicio</string>
     <string name="tab_history">Historial</string>
@@ -58,17 +62,26 @@
     <string name="report_photo_hint">Captura una foto clara de la acumulación de residuos.</string>
     <string name="report_location_detected">Ubicación detectada</string>
     <string name="report_details_hint">Detalles adicionales (Opcional)</string>
+    <string name="report_tap_to_capture">Tocar para tomar foto</string>
+    <string name="report_capture">Capturar foto</string>
+    <string name="report_retake">Tomar otra foto</string>
+    <string name="report_location_loading">Detectando ubicación...</string>
+    <string name="report_history_title">Mis Reportes</string>
+    <string name="report_history_empty">No tienes reportes enviados</string>
+    <string name="report_sending">Enviando reporte...</string>
+    <string name="report_sent">Reporte enviado exitosamente</string>
+    <string name="report_error">Error al enviar reporte</string>
+    <string name="report_camera_permission">Permiso de cámara necesario</string>
+    <string name="report_location_permission">Permiso de ubicación necesario</string>
+    <string name="estado_pendiente">Pendiente</string>
+    <string name="estado_en_proceso">En proceso</string>
+    <string name="estado_resuelto">Resuelto</string>
 
     <string name="settings_account">Cuenta</string>
-    <string name="settings_notifications">Notificaciones y Alertas</string>
     <string name="settings_name">Nombre</string>
     <string name="settings_email">Correo electrónico</string>
     <string name="settings_password">Contraseña</string>
     <string name="settings_address">Dirección de recolección principal</string>
-    <string name="settings_vibration">Vibración</string>
-    <string name="settings_vibration_desc">Al aproximarse el camión</string>
-    <string name="settings_sound">Sonido de alerta</string>
-    <string name="settings_sound_default">Predeterminado (Campana)</string>
     <string name="settings_logout">Cerrar sesión</string>
 
     <string name="alert_proximity_title">Activar Alertas</string>
@@ -76,9 +89,6 @@
     <string name="alert_radius">Radio de Alerta</string>
     <string name="alert_radius_hint">Te notificaremos aproximadamente 5 minutos antes de que el camión llegue a tu zona con un radio de 500m.</string>
     <string name="alert_days">Días de Recolección</string>
-    <string name="alert_days_hint">Selecciona los días que deseas recibir avisos basados en tu ruta.</string>
-    <string name="alert_sound">Sonido de Notificación</string>
-    <string name="alert_vibration">Vibración</string>
     <string name="distance_100">100m</string>
     <string name="distance_2km">2km</string>
 
@@ -105,6 +115,7 @@
     <string name="btn_cancelar">Cancelar</string>
     <string name="btn_guardar">Guardar</string>
     <string name="btn_eliminar">Eliminar</string>
+    <string name="btn_editar">Editar</string>
     <string name="enviar_por">Enviar por</string>
     <string name="enviar_alerta">Enviar alerta</string>
     <string name="sin_familiares">No tienes familiares registrados. Agrega uno para enviar alertas.</string>

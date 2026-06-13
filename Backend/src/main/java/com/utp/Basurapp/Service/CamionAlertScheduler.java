@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 public class CamionAlertScheduler {
 
-    private static final String SERVIDOR_RUTAS_URL = "http://localhost:3001/api/camion/ubicacion-actual";
+    private static final String SERVIDOR_RUTAS_URL = "http://localhost:3001/api/camiones";
     private final AlertaService alertaService;
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(3))
@@ -27,7 +27,7 @@ public class CamionAlertScheduler {
     }
 
     @Scheduled(fixedRate = 15000)
-    public void verificarProximidadCamion() {
+    public void verificarProximidadCamiones() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(SERVIDOR_RUTAS_URL))
@@ -38,16 +38,26 @@ public class CamionAlertScheduler {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                JsonNode json = objectMapper.readTree(response.body());
-                boolean activo = json.path("activo").asBoolean(false);
+                JsonNode camiones = objectMapper.readTree(response.body());
 
-                if (activo) {
-                    JsonNode coordenadas = json.path("coordenadas");
-                    double lat = coordenadas.path("latitud").asDouble();
-                    double lon = coordenadas.path("longitud").asDouble();
+                if (camiones.isArray()) {
+                    for (JsonNode camion : camiones) {
+                        boolean activo = camion.path("activo").asBoolean(false);
 
-                    if (lat != 0.0 && lon != 0.0) {
-                        alertaService.procesarUbicacionCamion(lat, lon);
+                        if (activo) {
+                            String idCamion = camion.path("idCamion").asText("");
+                            String placa = camion.path("placa").asText("");
+                            JsonNode coordenadas = camion.path("coordenadas");
+
+                            if (coordenadas != null && !coordenadas.isNull()) {
+                                double lat = coordenadas.path("latitud").asDouble();
+                                double lon = coordenadas.path("longitud").asDouble();
+
+                                if (lat != 0.0 && lon != 0.0) {
+                                    alertaService.procesarUbicacionCamion(idCamion, placa, lat, lon);
+                                }
+                            }
+                        }
                     }
                 }
             }

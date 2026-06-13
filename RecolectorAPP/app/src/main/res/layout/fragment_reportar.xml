@@ -23,33 +23,28 @@
             android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="?attr/colorOnSurface" />
-
-        <ImageButton
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_help_outline"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/report_title" />
     </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingHorizontal="20dp"
-        android:paddingBottom="16dp"
+        android:paddingBottom="12dp"
         android:text="@string/report_photo_hint"
         android:textSize="13sp"
         android:textColor="?attr/colorOnSurfaceVariant" />
 
     <FrameLayout
+        android:id="@+id/frameFoto"
         android:layout_width="match_parent"
         android:layout_height="220dp"
         android:layout_marginHorizontal="20dp"
         android:background="@drawable/bg_info_message"
-        android:foregroundTint="?attr/colorPrimary"
-        android:gravity="center">
+        android:clickable="true"
+        android:focusable="true">
 
         <LinearLayout
+            android:id="@+id/layoutPlaceholder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -66,11 +61,19 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tocar para tomar foto"
+                android:text="@string/report_tap_to_capture"
                 android:textSize="14sp"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:layout_marginTop="8dp" />
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/ivPreview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            android:contentDescription="@string/report_photo_hint" />
 
         <ImageButton
             android:id="@+id/btnCapture"
@@ -80,10 +83,10 @@
             android:layout_marginBottom="16dp"
             android:src="@drawable/ic_fiber_manual_record"
             android:background="@drawable/bg_info_message"
-            android:contentDescription="Capturar" />
+            android:contentDescription="@string/report_capture" />
 
         <ImageButton
-            android:id="@+id/btnSwitchCamera"
+            android:id="@+id/btnRetake"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="top|end"
@@ -91,7 +94,9 @@
             android:layout_marginEnd="8dp"
             android:src="@drawable/ic_cameraswitch"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Cambiar cámara" />
+            android:contentDescription="@string/report_retake"
+            android:visibility="gone" />
+
     </FrameLayout>
 
     <LinearLayout
@@ -100,7 +105,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="20dp"
-        android:paddingTop="20dp"
+        android:paddingTop="16dp"
         android:paddingBottom="8dp">
 
         <ImageView
@@ -124,20 +129,15 @@
                 android:textColor="?attr/colorPrimary" />
 
             <TextView
+                android:id="@+id/tvReportAddress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Av. San Martín 1540"
+                android:text="@string/report_location_loading"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="?attr/colorOnSurface" />
         </LinearLayout>
 
-        <ImageButton
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/ic_edit"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/report_details_hint" />
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -174,7 +174,39 @@
         app:cornerRadius="12dp" />
 
     <View
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/colorOutlineVariant"
+        android:layout_marginVertical="16dp"
+        android:layout_marginHorizontal="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/report_history_title"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="?attr/colorOnSurface"
+        android:paddingHorizontal="20dp"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tvSinReportes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/report_history_empty"
+        android:textSize="13sp"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:gravity="center"
+        android:padding="24dp"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvReportes"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp" />
+
 </LinearLayout>

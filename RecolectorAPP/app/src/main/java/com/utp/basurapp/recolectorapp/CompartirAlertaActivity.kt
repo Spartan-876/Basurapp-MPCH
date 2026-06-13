@@ -6,9 +6,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.RadioButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -18,7 +19,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import com.utp.basurapp.recolectorapp.api.RetrofitClient
 import com.utp.basurapp.recolectorapp.data.FamiliarRequest
 import com.utp.basurapp.recolectorapp.data.FamiliarResponse
@@ -32,6 +32,7 @@ class CompartirAlertaActivity : AppCompatActivity() {
     private lateinit var rvFamiliares: RecyclerView
     private lateinit var tvSinFamiliares: TextView
     private lateinit var etMensaje: TextInputEditText
+    private var familiarSeleccionadoIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,11 +55,20 @@ class CompartirAlertaActivity : AppCompatActivity() {
         etMensaje = findViewById(R.id.etMensaje)
 
         rvFamiliares.layoutManager = LinearLayoutManager(this)
-        adapter = FamiliarAdapter(familiares, { familiar ->
-            mostrarDialogEditarFamiliar(familiar)
-        }, { familiar ->
-            confirmarEliminarFamiliar(familiar)
-        })
+        adapter = FamiliarAdapter(
+            familiares,
+            selectedIndex = { familiarSeleccionadoIndex },
+            onSelect = { index ->
+                familiarSeleccionadoIndex = index
+                adapter.notifyDataSetChanged()
+            },
+            onEdit = { familiar ->
+                mostrarDialogEditarFamiliar(familiar)
+            },
+            onDelete = { familiar ->
+                confirmarEliminarFamiliar(familiar)
+            }
+        )
         rvFamiliares.adapter = adapter
 
         findViewById<MaterialButton>(R.id.btnNuevoFamiliar).setOnClickListener {
@@ -94,6 +104,9 @@ class CompartirAlertaActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         familiares.clear()
                         response.body()?.let { familiares.addAll(it) }
+                        if (familiarSeleccionadoIndex >= familiares.size) {
+                            familiarSeleccionadoIndex = 0
+                        }
                         actualizarLista()
                     } else {
                         Toast.makeText(this@CompartirAlertaActivity, R.string.error_cargar_familiares, Toast.LENGTH_SHORT).show()
@@ -141,7 +154,7 @@ class CompartirAlertaActivity : AppCompatActivity() {
             val telefono = etTelefono.text?.toString()?.trim() ?: ""
 
             if (nombre.isEmpty() || telefono.isEmpty()) {
-                Toast.makeText(this, "Nombre y teléfono son obligatorios", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Nombre y telefono son obligatorios", Toast.LENGTH_SHORT).show()
                 return@setPositiveButton
             }
 
@@ -254,7 +267,9 @@ class CompartirAlertaActivity : AppCompatActivity() {
     }
 
     private fun obtenerTelefonoSeleccionado(): String {
-        return if (familiares.isNotEmpty()) {
+        return if (familiares.isNotEmpty() && familiarSeleccionadoIndex < familiares.size) {
+            familiares[familiarSeleccionadoIndex].telefono
+        } else if (familiares.isNotEmpty()) {
             familiares[0].telefono
         } else {
             "51"
@@ -263,14 +278,18 @@ class CompartirAlertaActivity : AppCompatActivity() {
 
     private class FamiliarAdapter(
         private val items: List<FamiliarResponse>,
+        private val selectedIndex: () -> Int,
+        private val onSelect: (Int) -> Unit,
         private val onEdit: (FamiliarResponse) -> Unit,
         private val onDelete: (FamiliarResponse) -> Unit
     ) : RecyclerView.Adapter<FamiliarAdapter.ViewHolder>() {
 
         class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val rbSeleccionar: RadioButton = view.findViewById(R.id.rbSeleccionar)
             val tvNombre: TextView = view.findViewById(R.id.tvItemNombre)
             val tvTelefono: TextView = view.findViewById(R.id.tvItemTelefono)
-            val btnEliminar: MaterialButton = view.findViewById(R.id.btnItemEliminar)
+            val btnEditar: ImageButton = view.findViewById(R.id.btnItemEditar)
+            val btnEliminar: ImageButton = view.findViewById(R.id.btnItemEliminar)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -281,9 +300,15 @@ class CompartirAlertaActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = items[position]
+            val isSelected = position == selectedIndex()
+
             holder.tvNombre.text = item.nombre
             holder.tvTelefono.text = item.telefono
-            holder.itemView.setOnClickListener { onEdit(item) }
+            holder.rbSeleccionar.isChecked = isSelected
+
+            holder.itemView.setOnClickListener { onSelect(position) }
+            holder.rbSeleccionar.setOnClickListener { onSelect(position) }
+            holder.btnEditar.setOnClickListener { onEdit(item) }
             holder.btnEliminar.setOnClickListener { onDelete(item) }
         }
 

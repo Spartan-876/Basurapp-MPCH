@@ -25,9 +25,11 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/FotosReportes/**").permitAll()
                         .requestMatchers("/api/usuarios/fcm-token").authenticated()
                         .requestMatchers("/api/usuarios/perfil").authenticated()
                         .requestMatchers("/api/usuarios/familiares/**").authenticated()
+                        .requestMatchers("/api/reportes/**").authenticated()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/usuarios/**").permitAll()
                         .anyRequest().authenticated())

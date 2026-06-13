@@ -19,8 +19,6 @@ class SessionManager(context: Context) {
         private const val KEY_DIRECCION = "direccion"
         private const val KEY_RADIO_ALERTAS = "radio_alertas"
         private const val KEY_ALERTAS_ACTIVADAS = "alertas_activadas"
-        private const val KEY_VIBRACION_ACTIVADA = "vibracion_activada"
-        private const val KEY_SONIDO_ACTIVADO = "sonido_activado"
         private const val KEY_DIAS_ACTIVOS = "dias_activos"
         private const val KEY_TEMA = "tema"
     }
@@ -84,18 +82,6 @@ class SessionManager(context: Context) {
     }
 
     fun isAlertasActivadas(): Boolean = prefs.getBoolean(KEY_ALERTAS_ACTIVADAS, true)
-
-    fun setVibracionActivada(activada: Boolean) {
-        prefs.edit().putBoolean(KEY_VIBRACION_ACTIVADA, activada).apply()
-    }
-
-    fun isVibracionActivada(): Boolean = prefs.getBoolean(KEY_VIBRACION_ACTIVADA, true)
-
-    fun setSonidoActivado(activado: Boolean) {
-        prefs.edit().putBoolean(KEY_SONIDO_ACTIVADO, activado).apply()
-    }
-
-    fun isSonidoActivado(): Boolean = prefs.getBoolean(KEY_SONIDO_ACTIVADO, true)
 
     fun guardarDiasActivos(dias: Set<Int>) {
         val sb = StringBuilder()

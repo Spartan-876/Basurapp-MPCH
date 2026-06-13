@@ -38,4 +38,8 @@ object RetrofitClient {
             "RetrofitClient no inicializado. Llama a RetrofitClient.init() primero."
         )
     }
+
+    fun getBaseUrl(): String {
+        return BuildConfig.BASE_URL
+    }
 }

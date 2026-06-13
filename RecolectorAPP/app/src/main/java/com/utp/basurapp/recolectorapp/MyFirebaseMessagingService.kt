@@ -38,8 +38,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        val titulo = remoteMessage.notification?.title ?: "¡Camión cerca!"
-        val mensaje = remoteMessage.notification?.body ?: "El recolector está por tu casa."
+        val titulo = remoteMessage.notification?.title ?: "Camion cerca!"
+        val mensaje = remoteMessage.notification?.body ?: "El recolector esta por tu casa."
         mostrarNotificacion(titulo, mensaje)
     }
 
@@ -48,7 +48,18 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, "Alertas Basura", NotificationManager.IMPORTANCE_HIGH)
+            val existingChannel = notificationManager.getNotificationChannel(channelId)
+            if (existingChannel != null) {
+                notificationManager.deleteNotificationChannel(channelId)
+            }
+
+            val channel = NotificationChannel(
+                channelId,
+                "Alertas Basura",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notificaciones de proximidad del camion recolector"
+            }
             notificationManager.createNotificationChannel(channel)
         }
 
@@ -58,6 +69,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setContentText(message)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setDefaults(NotificationCompat.DEFAULT_SOUND or NotificationCompat.DEFAULT_VIBRATE)
 
         notificationManager.notify(1, builder.build())
 

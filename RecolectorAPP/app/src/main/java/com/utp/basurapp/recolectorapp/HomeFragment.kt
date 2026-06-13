@@ -3,13 +3,13 @@ package com.utp.basurapp.recolectorapp
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.ViewCompat
@@ -24,6 +24,7 @@ import com.utp.basurapp.recolectorapp.util.SessionManager
 import org.maplibre.android.MapLibre
 import org.maplibre.android.WellKnownTileServer
 import org.maplibre.android.annotations.IconFactory
+import org.maplibre.android.annotations.Marker
 import org.maplibre.android.annotations.MarkerOptions
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
@@ -40,17 +41,20 @@ class HomeFragment : Fragment() {
     private lateinit var sessionManager: SessionManager
 
     private var map: MapLibreMap? = null
-    private var userMarker: org.maplibre.android.annotations.Marker? = null
-    private var truckMarker: org.maplibre.android.annotations.Marker? = null
-    private var camionLat: Double = 0.0
-    private var camionLon: Double = 0.0
-    private var camionActivo: Boolean = false
+    private var userMarker: Marker? = null
+    private val truckMarkers = mutableMapOf<String, Marker>()
+    private val truckDataMap = mutableMapOf<String, CamionResponse>()
+
+    private val truckMarkerResIds = intArrayOf(
+        R.drawable.ic_truck_marker_green,
+        R.drawable.ic_truck_marker_orange
+    )
 
     private val refreshHandler = Handler(Looper.getMainLooper())
     private val refreshInterval = 8000L
     private val refreshRunnable = object : Runnable {
         override fun run() {
-            fetchUbicacionCamion()
+            fetchCamiones()
             refreshHandler.postDelayed(this, refreshInterval)
         }
     }
@@ -90,9 +94,6 @@ class HomeFragment : Fragment() {
             startActivity(Intent(requireContext(), CompartirAlertaActivity::class.java))
         }
 
-        view.findViewById<ImageButton>(R.id.btnNotifications).setOnClickListener {
-            startActivity(Intent(requireContext(), AlertasConfigActivity::class.java))
-        }
     }
 
     private fun setupMap() {
@@ -112,6 +113,7 @@ class HomeFragment : Fragment() {
         mapFragment.getMapAsync { mapLibreMap ->
             map = mapLibreMap
             mapLibreMap.setStyle(Style.Builder().fromUrl("https://tiles.openfreemap.org/styles/liberty")) { style ->
+                mapLibreMap.setInfoWindowAdapter(TruckInfoWindowAdapter())
                 fetchPerfil(mapLibreMap)
             }
         }
@@ -136,50 +138,41 @@ class HomeFragment : Fragment() {
                             view?.findViewById<TextView>(R.id.tvZona)?.text = body.direccion
                         }
                     }
-                    fetchUbicacionCamion()
+                    fetchCamiones()
                 }
 
                 override fun onFailure(call: retrofit2.Call<PerfilResponse>, t: Throwable) {
-                    fetchUbicacionCamion()
+                    fetchCamiones()
                 }
             })
     }
 
-    private fun fetchUbicacionCamion() {
+    private fun fetchCamiones() {
         val currentMap = map ?: return
 
-        RetrofitClient.getApiService().getCamionUbicacion()
-            .enqueue(object : retrofit2.Callback<CamionResponse> {
+        RetrofitClient.getApiService().getCamiones()
+            .enqueue(object : retrofit2.Callback<List<CamionResponse>> {
                 override fun onResponse(
-                    call: retrofit2.Call<CamionResponse>,
-                    response: retrofit2.Response<CamionResponse>
+                    call: retrofit2.Call<List<CamionResponse>>,
+                    response: retrofit2.Response<List<CamionResponse>>
                 ) {
-                    var cLat = miLat + 0.003
-                    var cLon = miLon + 0.003
-                    var activo = false
-
-                    if (response.isSuccessful) {
-                        val body = response.body()
-                        if (body != null && body.coordenadas != null && body.activo) {
-                            cLat = body.coordenadas.latitud
-                            cLon = body.coordenadas.longitud
-                            activo = true
+                    val camiones = response.body()
+                    if (camiones != null && camiones.isNotEmpty()) {
+                        truckDataMap.clear()
+                        for (camion in camiones) {
+                            if (camion.idCamion != null) {
+                                truckDataMap[camion.idCamion] = camion
+                            }
                         }
+                        actualizarMarcadoresCamiones(currentMap, camiones)
+                        actualizarCardDistancia(camiones)
+                    } else {
+                        actualizarCardDistancia(emptyList())
                     }
-
-                    camionLat = cLat
-                    camionLon = cLon
-                    camionActivo = activo
-                    actualizarCardDistancia()
-                    actualizarMarcadores(currentMap, camionLat, camionLon)
                 }
 
-                override fun onFailure(call: retrofit2.Call<CamionResponse>, t: Throwable) {
-                    camionLat = miLat + 0.003
-                    camionLon = miLon + 0.003
-                    camionActivo = false
-                    actualizarCardDistancia()
-                    actualizarMarcadores(currentMap, camionLat, camionLon)
+                override fun onFailure(call: retrofit2.Call<List<CamionResponse>>, t: Throwable) {
+                    actualizarCardDistancia(emptyList())
                 }
             })
     }
@@ -195,19 +188,47 @@ class HomeFragment : Fragment() {
         return radioTierra * c
     }
 
-    private fun actualizarCardDistancia() {
+    private fun actualizarCardDistancia(camiones: List<CamionResponse>) {
         val card = view?.findViewById<MaterialCardView>(R.id.cardCamionDistancia) ?: return
         val tv = view?.findViewById<TextView>(R.id.tvDistanciaCamion) ?: return
 
-        if (!camionActivo) {
+        val activos = camiones.filter { it.activo && it.coordenadas != null }
+
+        if (activos.isEmpty()) {
             tv.text = getString(R.string.truck_no_data)
             card.visibility = View.VISIBLE
             return
         }
 
-        val distancia = calcularDistanciaMetros(miLat, miLon, camionLat, camionLon)
-        val distStr = if (distancia < 1000) "${distancia.toInt()} m" else "${"%.1f".format(distancia / 1000)} km"
-        tv.text = distStr
+        var menorDistancia = Double.MAX_VALUE
+        var camionMasCercano: CamionResponse? = null
+
+        for (camion in activos) {
+            val dist = calcularDistanciaMetros(miLat, miLon, camion.coordenadas!!.latitud, camion.coordenadas.longitud)
+            if (dist < menorDistancia) {
+                menorDistancia = dist
+                camionMasCercano = camion
+            }
+        }
+
+        if (camionMasCercano != null) {
+            val distStr = if (menorDistancia < 1000) "${menorDistancia.toInt()} m" else "${"%.1f".format(menorDistancia / 1000)} km"
+            tv.text = "${camionMasCercano.placa ?: camionMasCercano.idCamion} — $distStr"
+        } else {
+            tv.text = getString(R.string.truck_no_data)
+        }
+
+        val tvActivos = view?.findViewById<TextView>(R.id.tvTrucksActivos)
+        if (tvActivos != null) {
+            val activosCount = activos.size
+            if (activosCount > 1) {
+                tvActivos.text = getString(R.string.trucks_active_count, activosCount)
+                tvActivos.visibility = View.VISIBLE
+            } else {
+                tvActivos.visibility = View.GONE
+            }
+        }
+
         card.visibility = View.VISIBLE
     }
 
@@ -224,7 +245,11 @@ class HomeFragment : Fragment() {
         return bitmap
     }
 
-    private fun actualizarMarcadores(mapLibreMap: MapLibreMap, cLat: Double, cLon: Double) {
+    private fun getTruckMarkerRes(index: Int): Int {
+        return truckMarkerResIds[index % truckMarkerResIds.size]
+    }
+
+    private fun actualizarMarcadoresCamiones(mapLibreMap: MapLibreMap, camiones: List<CamionResponse>) {
         val context = requireContext()
 
         if (userMarker == null) {
@@ -239,21 +264,80 @@ class HomeFragment : Fragment() {
             mapLibreMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(miLat, miLon), 16.0))
         }
 
-        if (truckMarker == null) {
-            val truckIcon = IconFactory.getInstance(context).fromBitmap(drawableToBitmap(R.drawable.ic_truck_marker))
-            truckMarker = mapLibreMap.addMarker(
-                MarkerOptions()
-                    .position(LatLng(cLat, cLon))
-                    .title("Camion Recolector")
-                    .snippet("Ubicacion actual")
-                    .icon(truckIcon)
-            )
-        } else {
-            truckMarker?.position = LatLng(cLat, cLon)
+        val activeIds = camiones.mapNotNull { it.idCamion }.toSet()
+
+        val markersToRemove = truckMarkers.keys.filter { it !in activeIds }
+        for (id in markersToRemove) {
+            truckMarkers[id]?.let { mapLibreMap.removeMarker(it) }
+            truckMarkers.remove(id)
+        }
+
+        for ((index, camion) in camiones.withIndex()) {
+            val id = camion.idCamion ?: continue
+            val coords = camion.coordenadas ?: continue
+
+            val markerRes = getTruckMarkerRes(index)
+            val truckIcon = IconFactory.getInstance(context).fromBitmap(drawableToBitmap(markerRes))
+
+            val existingMarker = truckMarkers[id]
+            if (existingMarker == null) {
+                val marker = mapLibreMap.addMarker(
+                    MarkerOptions()
+                        .position(LatLng(coords.latitud, coords.longitud))
+                        .title(camion.placa ?: id)
+                        .snippet(if (camion.activo) "Activo" else "Inactivo")
+                        .icon(truckIcon)
+                )
+                truckMarkers[id] = marker
+            } else {
+                existingMarker.position = LatLng(coords.latitud, coords.longitud)
+                existingMarker.title = camion.placa ?: id
+                existingMarker.snippet = if (camion.activo) "Activo" else "Inactivo"
+            }
         }
     }
 
-    override fun onResume() {
+    inner class TruckInfoWindowAdapter : MapLibreMap.InfoWindowAdapter {
+
+        override fun getInfoWindow(marker: Marker): View {
+            val view = LayoutInflater.from(requireContext()).inflate(R.layout.view_truck_info_window, null)
+
+            val tvPlaca = view.findViewById<TextView>(R.id.tvInfoPlaca)
+            val tvEstado = view.findViewById<TextView>(R.id.tvInfoEstado)
+            val tvDistancia = view.findViewById<TextView>(R.id.tvInfoDistancia)
+
+            val truckId = truckMarkers.entries.find { it.value == marker }?.key
+            val camion = truckId?.let { truckDataMap[it] }
+
+            if (camion != null) {
+                tvPlaca.text = camion.placa ?: camion.idCamion
+
+                if (camion.activo) {
+                    tvEstado.text = "• ${getString(R.string.truck_active)}"
+                    tvEstado.setTextColor(Color.parseColor("#2E7D32"))
+                } else {
+                    tvEstado.text = "• ${getString(R.string.truck_inactive)}"
+                    tvEstado.setTextColor(Color.parseColor("#FF6D00"))
+                }
+
+                if (camion.coordenadas != null) {
+                    val dist = calcularDistanciaMetros(miLat, miLon, camion.coordenadas.latitud, camion.coordenadas.longitud)
+                    tvDistancia.text = if (dist < 1000) "${dist.toInt()} m" else "${"%.1f".format(dist / 1000)} km"
+                } else {
+                    tvDistancia.text = "N/D"
+                }
+            } else {
+                tvPlaca.text = marker.title
+                tvEstado.text = "• ${marker.snippet}"
+                tvEstado.setTextColor(Color.parseColor("#888888"))
+                tvDistancia.text = "N/D"
+            }
+
+            return view
+        }
+    }
+
+override fun onResume() {
         super.onResume()
         refreshHandler.postDelayed(refreshRunnable, refreshInterval)
     }
@@ -268,6 +352,7 @@ class HomeFragment : Fragment() {
         refreshHandler.removeCallbacks(refreshRunnable)
         map = null
         userMarker = null
-        truckMarker = null
+        truckMarkers.clear()
+        truckDataMap.clear()
     }
 }
