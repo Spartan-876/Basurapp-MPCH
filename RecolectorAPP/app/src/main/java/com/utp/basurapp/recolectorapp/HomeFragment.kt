@@ -138,13 +138,30 @@ class HomeFragment : Fragment() {
                             view?.findViewById<TextView>(R.id.tvZona)?.text = body.direccion
                         }
                     }
+                    agregarPinUsuario(mapLibreMap)
                     fetchCamiones()
                 }
 
                 override fun onFailure(call: retrofit2.Call<PerfilResponse>, t: Throwable) {
+                    agregarPinUsuario(mapLibreMap)
                     fetchCamiones()
                 }
             })
+    }
+
+    private fun agregarPinUsuario(mapLibreMap: MapLibreMap) {
+        if (userMarker == null) {
+            val context = requireContext()
+            val homeIcon = IconFactory.getInstance(context).fromBitmap(drawableToBitmap(R.drawable.ic_home_marker))
+            userMarker = mapLibreMap.addMarker(
+                MarkerOptions()
+                    .position(LatLng(miLat, miLon))
+                    .title("Mi Ubicacion")
+                    .snippet("Tu punto de alerta")
+                    .icon(homeIcon)
+            )
+            mapLibreMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(miLat, miLon), 16.0))
+        }
     }
 
     private fun fetchCamiones() {
@@ -251,18 +268,6 @@ class HomeFragment : Fragment() {
 
     private fun actualizarMarcadoresCamiones(mapLibreMap: MapLibreMap, camiones: List<CamionResponse>) {
         val context = requireContext()
-
-        if (userMarker == null) {
-            val homeIcon = IconFactory.getInstance(context).fromBitmap(drawableToBitmap(R.drawable.ic_home_marker))
-            userMarker = mapLibreMap.addMarker(
-                MarkerOptions()
-                    .position(LatLng(miLat, miLon))
-                    .title("Mi Ubicacion")
-                    .snippet("Tu punto de alerta")
-                    .icon(homeIcon)
-            )
-            mapLibreMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(miLat, miLon), 16.0))
-        }
 
         val activeIds = camiones.mapNotNull { it.idCamion }.toSet()
 

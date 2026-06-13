@@ -97,6 +97,17 @@ app.get('/api/camion/ubicacion-actual', (req, res) => {
     res.json(formatoCamion(camion));
 });
 
+app.put('/api/camion/:id/estado', (req, res) => {
+    const camion = camiones.find(c => c.id === req.params.id);
+    if (!camion) {
+        return res.status(404).json({ error: "Camion no encontrado" });
+    }
+    if (req.body.activo !== undefined) {
+        camion.activo = req.body.activo;
+    }
+    res.json({ mensaje: "Estado actualizado", camion: formatoCamion(camion) });
+});
+
 app.post('/api/camion/control', (req, res) => {
     const { idCamion, activo, reiniciar } = req.body;
 
