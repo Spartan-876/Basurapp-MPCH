@@ -26,7 +26,7 @@ public class AlertaService {
     private final Set<String> usuariosEnZona = new HashSet<>();
 
     public void procesarUbicacionCamion(double lat, double lon) {
-        double radioMetros = 500.0;
+        double radioMetros = 300.0;
         List<Usuario> usuariosCerca = usuarioRepository.encontrarUsuariosEnRadio(lat, lon, radioMetros);
 
         Set<String> emailEnZona = new HashSet<>();

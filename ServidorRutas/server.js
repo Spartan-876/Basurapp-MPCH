@@ -16,7 +16,7 @@ const __dirname = path.dirname(__filename);
 let rutaCamion = [];
 
 try {
-    const rutaArchivo = path.join(__dirname, 'ruta_simulacion.geojson');
+    const rutaArchivo = path.join(__dirname, 'ruta_camion.geojson');
     const dataRaw = fs.readFileSync(rutaArchivo, 'utf8');
     const geojsonData = JSON.parse(dataRaw);
 
