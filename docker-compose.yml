@@ -41,6 +41,7 @@ services:
 
     volumes:
       - ./Backend/FotosReportes:/app/FotosReportes
+      - ./Backend/src/main/resources/firebase-service-account.json:/app/config/firebase-service-account.json:ro
     networks:
       - basurapp_network
 

@@ -14,7 +14,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MapIcon from '@mui/icons-material/Map';
 import LogoutIcon from '@mui/icons-material/Logout';
-import GrassIcon from '@mui/icons-material/Grass';
+import ecocixLogo from '../assets/ecocix-logo.png';
 
 const DRAWER_WIDTH = 240;
 
@@ -44,13 +44,11 @@ export default function AdminLayout() {
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 2.5, py: 2.5 }}>
         <Avatar
           sx={{
-            bgcolor: theme.palette.success.main,
-            color: 'white',
             width: 40,
             height: 40,
           }}
         >
-          <GrassIcon />
+          <Box component="img" src={ecocixLogo} sx={{ width: 40, height: 40, borderRadius: '50%' }} />
         </Avatar>
         <Box>
           <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'primary.contrastText', lineHeight: 1.2 }}>

@@ -5,7 +5,7 @@ import {
   Box, Card, CardContent, TextField, Button, Typography, Alert, CircularProgress, Avatar, useTheme, alpha,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import GrassIcon from '@mui/icons-material/Grass';
+import ecocixLogo from '../assets/ecocix-logo.png';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -45,15 +45,14 @@ export default function LoginPage() {
           <Box sx={{ textAlign: 'center', mb: 3 }}>
             <Avatar
               sx={{
-                bgcolor: 'primary.main',
                 width: 72,
                 height: 72,
                 mx: 'auto',
                 mb: 2,
-                boxShadow: `0 4px 24px ${alpha(theme.palette.primary.main, 0.3)}`,
+                backgroundColor: 'transparent' ,
               }}
             >
-              <GrassIcon sx={{ fontSize: 40 }} />
+              <Box component="img" src={ecocixLogo} sx={{ width: 72, height: 72, borderRadius: '50%' }} />
             </Avatar>
             <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main' }}>
               EcoCix Admin

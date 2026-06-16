@@ -44,3 +44,7 @@ AGENTS.md
 **/skills-lock.json
 opencode.json
 RecolectorAPP/secrets.properties
+
+##Docker##
+**/Dockerfile
+docker-compose.yml

@@ -1,5 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import Map, { Marker } from 'react-map-gl/maplibre';
+import type { MapRef } from 'react-map-gl/maplibre';
+import maplibregl from 'maplibre-gl';
 import {
   Box, Typography, Card, CardContent, Chip, Avatar, IconButton, useTheme, alpha,
   CircularProgress,
@@ -9,13 +12,23 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { adminService } from '../services/api';
+import { API_URL } from '../config/axios';
 import type { Camion } from '../types';
+import ecocixLogo from '../assets/ecocix-logo.png';
 
+const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
 const CHICLAYO_CENTER = { lat: -6.7714, lng: -79.8409 };
+const GEOJSON_URL = `${API_URL}/geojson/limites_chiclayo.geojson`;
 
 export default function LiveMapPage() {
   const theme = useTheme();
-  const [positions, setPositions] = useState<Record<string, { lat: number; lng: number }>>({});
+  const mapRef = useRef<MapRef>(null);
+  const polygonAdded = useRef(false);
+  const [viewState, setViewState] = useState({
+    longitude: CHICLAYO_CENTER.lng,
+    latitude: CHICLAYO_CENTER.lat,
+    zoom: 14,
+  });
 
   const { data: camiones = [], isLoading, refetch } = useQuery({
     queryKey: ['camiones'],
@@ -23,17 +36,68 @@ export default function LiveMapPage() {
     refetchInterval: 8000,
   });
 
-  useEffect(() => {
-    const newPos: Record<string, { lat: number; lng: number }> = {};
-    camiones.forEach((c: Camion) => {
-      if (c.coordenadas) {
-        newPos[c.idCamion] = { lat: c.coordenadas.latitud, lng: c.coordenadas.longitud };
-      }
-    });
-    setPositions(newPos);
-  }, [camiones]);
-
   const activeCamiones = camiones.filter((c: Camion) => c.activo);
+
+  const handleRecenter = useCallback(() => {
+    setViewState({
+      longitude: CHICLAYO_CENTER.lng,
+      latitude: CHICLAYO_CENTER.lat,
+      zoom: 14,
+    });
+  }, []);
+
+  useEffect(() => {
+    const map = mapRef.current?.getMap();
+    if (!map || polygonAdded.current) return;
+
+    const onLoaded = () => {
+      if (polygonAdded.current) return;
+
+      fetch(GEOJSON_URL)
+        .then((res) => res.json())
+        .then((geojson) => {
+          if (!mapRef.current) return;
+          const m = mapRef.current.getMap();
+          if (!m || m.getSource('chiclayo-limites')) return;
+
+          m.addSource('chiclayo-limites', {
+            type: 'geojson',
+            data: geojson,
+          });
+
+          m.addLayer({
+            id: 'chiclayo-fill',
+            type: 'fill',
+            source: 'chiclayo-limites',
+            paint: {
+              'fill-color': '#2E7D32',
+              'fill-opacity': 0.07,
+            },
+          });
+
+          m.addLayer({
+            id: 'chiclayo-border',
+            type: 'line',
+            source: 'chiclayo-limites',
+            paint: {
+              'line-color': '#2E7D32',
+              'line-width': 2,
+              'line-dasharray': [4, 2],
+            },
+          });
+
+          polygonAdded.current = true;
+        })
+        .catch(() => {});
+    };
+
+    map.on('load', onLoaded);
+    if (map.isStyleLoaded()) onLoaded();
+
+    return () => {
+      map.off('load', onLoaded);
+    };
+  }, []);
 
   return (
     <Box sx={{ display: 'flex', gap: 2, height: 'calc(100vh - 128px)', minHeight: 500 }}>
@@ -47,94 +111,75 @@ export default function LiveMapPage() {
           flexDirection: 'column',
         }}
       >
-        {/* Mapa de fondo */}
-        <Box
-          sx={{
-            flex: 1,
-            position: 'relative',
-            bgcolor: 'grey.100',
-            overflow: 'hidden',
-          }}
-        >
-          {/* Grid de fondo */}
-          <svg
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-            preserveAspectRatio="none"
-            viewBox="0 0 100 100"
+        <Box sx={{ flex: 1, position: 'relative' }}>
+          <Map
+            ref={mapRef}
+            {...viewState}
+            onMove={(evt) => setViewState(evt.viewState)}
+            style={{ width: '100%', height: '100%' }}
+            mapStyle={MAP_STYLE}
+            attributionControl={false}
           >
-            <defs>
-              <pattern id="grid" width="5" height="5" patternUnits="userSpaceOnUse">
-                <path d="M 5 0 L 0 0 0 5" fill="none" stroke={theme.palette.grey[300]} strokeWidth="0.15" />
-              </pattern>
-            </defs>
-            <rect width="100" height="100" fill="url(#grid)" />
-            {/* Polígono Chiclayo placeholder */}
-            <polygon
-              fill={alpha(theme.palette.primary.main, 0.05)}
-              stroke={alpha(theme.palette.primary.main, 0.3)}
-              strokeWidth="0.4"
-              strokeDasharray="1,0.5"
-              points="20,25 80,15 90,55 55,85 10,70"
-            />
-          </svg>
-
-          {/* Marcadores de camiones */}
-          {camiones.map((c: Camion) => {
-            const pos = positions[c.idCamion];
-            if (!pos) return null;
-            const offsetX = ((pos.lng - CHICLAYO_CENTER.lng) / 0.05) * 100;
-            const offsetY = ((CHICLAYO_CENTER.lat - pos.lat) / 0.05) * 100;
-            const clampedX = Math.max(10, Math.min(90, 50 + offsetX * 0.4));
-            const clampedY = Math.max(10, Math.min(90, 50 + offsetY * 0.4));
-
-            return (
-              <Box
-                key={c.idCamion}
-                sx={{
-                  position: 'absolute',
-                  left: `${clampedX}%`,
-                  top: `${clampedY}%`,
-                  transform: 'translate(-50%, -50%)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  zIndex: 2,
-                }}
-              >
-                <Avatar
-                  sx={{
-                    width: 40,
-                    height: 40,
-                    bgcolor: c.activo ? 'background.paper' : 'grey.300',
-                    color: c.activo ? 'primary.main' : 'grey.600',
-                    border: `2px solid ${c.activo ? theme.palette.primary.main : theme.palette.grey[400]}`,
-                    boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
-                  }}
+            {camiones.map((c: Camion) => {
+              if (!c.coordenadas) return null;
+              return (
+                <Marker
+                  key={c.idCamion}
+                  longitude={c.coordenadas.longitud}
+                  latitude={c.coordenadas.latitud}
+                  anchor="bottom"
                 >
-                  <LocalShippingIcon />
-                </Avatar>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    mt: 0.5,
-                    bgcolor: 'background.paper',
-                    px: 1,
-                    py: 0.25,
-                    borderRadius: 1,
-                    fontSize: 10,
-                    fontWeight: 700,
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {c.placa}
-                </Typography>
-              </Box>
-            );
-          })}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      filter: c.activo ? 'none' : 'grayscale(0.6) opacity(0.5)',
+                      transition: 'filter 0.2s',
+                      '&:hover': { filter: 'none' },
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      src={ecocixLogo}
+                      alt={c.placa}
+                      sx={{
+                        width: 44,
+                        height: 52,
+                        objectFit: 'contain',
+                        filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.3))',
+                        transition: 'transform 0.2s',
+                        '&:hover': { transform: 'scale(1.12)' },
+                      }}
+                    />
+                    <Typography
+                      sx={{
+                        mt: -1,
+                        bgcolor: 'background.paper',
+                        px: 0.75,
+                        py: 0.15,
+                        borderRadius: 1,
+                        fontSize: 9,
+                        fontWeight: 700,
+                        fontFamily: 'Inter, sans-serif',
+                        boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+                        whiteSpace: 'nowrap',
+                        lineHeight: 1.2,
+                        border: '1px solid rgba(0,0,0,0.06)',
+                        zIndex: 1,
+                      }}
+                    >
+                      {c.placa}
+                    </Typography>
+                  </Box>
+                </Marker>
+              );
+            })}
+          </Map>
 
           {/* Floating controls */}
-          <Box sx={{ position: 'absolute', top: 12, right: 12, display: 'flex', flexDirection: 'column', gap: 1, zIndex: 3 }}>
+          <Box sx={{ position: 'absolute', top: 12, left: 12, display: 'flex', flexDirection: 'column', gap: 1, zIndex: 3 }}>
             <IconButton
               onClick={() => refetch()}
               sx={{
@@ -146,6 +191,7 @@ export default function LiveMapPage() {
               <RefreshIcon />
             </IconButton>
             <IconButton
+              onClick={handleRecenter}
               sx={{
                 bgcolor: 'background.paper',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -176,7 +222,7 @@ export default function LiveMapPage() {
             }}
           >
             <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'primary.main' }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'success.main' }}>
                 Flota activa
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -186,7 +232,7 @@ export default function LiveMapPage() {
             <Chip
               label="Actualización cada 8s"
               size="small"
-              color="primary"
+              color="success"
               variant="outlined"
               sx={{ fontWeight: 600 }}
             />
@@ -219,63 +265,73 @@ export default function LiveMapPage() {
           </Box>
         ) : (
           <Box sx={{ flex: 1, overflow: 'auto', px: 2, pb: 2 }}>
-            {camiones.map((c: Camion) => {
-              const pos = positions[c.idCamion];
-              return (
-                <Card
-                  key={c.idCamion}
-                  sx={{
-                    mb: 1.5,
-                    opacity: c.activo ? 1 : 0.55,
-                    border: `1px solid ${c.activo ? theme.palette.grey[200] : theme.palette.grey[100]}`,
-                    boxShadow: 'none',
-                    transition: 'opacity 0.2s',
-                  }}
-                >
-                  <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Avatar
-                          sx={{
-                            width: 36,
-                            height: 36,
-                            bgcolor: c.activo ? alpha(theme.palette.primary.main, 0.1) : 'grey.100',
-                            color: c.activo ? 'primary.main' : 'grey.500',
-                          }}
-                        >
-                          <LocalShippingIcon fontSize="small" />
-                        </Avatar>
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-                            {c.idCamion}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {c.placa}
-                          </Typography>
-                        </Box>
-                      </Box>
-                      <Chip
-                        label={c.activo ? 'Activo' : 'Inactivo'}
-                        color={c.activo ? 'success' : 'error'}
-                        size="small"
-                        sx={{ fontWeight: 600 }}
-                      />
-                    </Box>
-                    {pos && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
-                        <LocationOnIcon sx={{ fontSize: 14 }} />
-                        <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                          {pos.lat.toFixed(4)}, {pos.lng.toFixed(4)}
+            {camiones.map((c: Camion) => (
+              <Card
+                key={c.idCamion}
+                sx={{
+                  mb: 1.5,
+                  opacity: c.activo ? 1 : 0.55,
+                  border: `1px solid ${c.activo ? theme.palette.grey[200] : theme.palette.grey[100]}`,
+                  boxShadow: 'none',
+                  transition: 'opacity 0.2s',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    borderColor: c.activo ? 'success.main' : theme.palette.grey[200],
+                  },
+                }}
+                onClick={() => {
+                  if (c.coordenadas) {
+                    setViewState({
+                      longitude: c.coordenadas.longitud,
+                      latitude: c.coordenadas.latitud,
+                      zoom: 16,
+                    });
+                  }
+                }}
+              >
+                <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Avatar
+                        sx={{
+                          width: 36,
+                          height: 36,
+                          bgcolor: c.activo ? alpha(theme.palette.success.main, 0.1) : 'grey.100',
+                          color: c.activo ? 'success.main' : 'grey.500',
+                        }}
+                      >
+                        <LocalShippingIcon fontSize="small" />
+                      </Avatar>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+                          {c.idCamion}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {c.placa}
                         </Typography>
                       </Box>
-                    )}
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                      Última actualización: {new Date(c.ultimaActualizacion).toLocaleTimeString()}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                    </Box>
+                    <Chip
+                      label={c.activo ? 'Activo' : 'Inactivo'}
+                      color={c.activo ? 'success' : 'error'}
+                      size="small"
+                      sx={{ fontWeight: 600 }}
+                    />
+                  </Box>
+                  {c.coordenadas && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
+                      <LocationOnIcon sx={{ fontSize: 14 }} />
+                      <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                        {c.coordenadas.latitud.toFixed(4)}, {c.coordenadas.longitud.toFixed(4)}
+                      </Typography>
+                    </Box>
+                  )}
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                    Última actualización: {new Date(c.ultimaActualizacion).toLocaleTimeString()}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))}
           </Box>
         )}
       </Card>
