@@ -332,7 +332,7 @@ class ReportarFragment : Fragment() {
             holder.tvEstado.text = context.getString(textRes)
 
             val baseUrl = com.utp.basurapp.recolectorapp.api.RetrofitClient.getBaseUrl()
-            val imageUrl = "${baseUrl}FotosReportes/${item.nombreFoto}"
+            val imageUrl = "${baseUrl}${item.nombreFoto}"
 
             holder.ivFoto.setImageResource(R.drawable.ic_add_photo)
             Thread {
