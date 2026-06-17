@@ -6,6 +6,9 @@ import com.utp.Basurapp.common.repository.ReporteRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -20,7 +23,21 @@ public class AdminReporteController {
 
     @GetMapping
     public ResponseEntity<?> listarReportes() {
-        return ResponseEntity.ok(reporteRepository.findAll());
+        List<Reporte> reportes = reporteRepository.findAll();
+        List<Map<String, Object>> dtos = new ArrayList<>();
+        for (Reporte r : reportes) {
+            Map<String, Object> dto = new HashMap<>();
+            dto.put("id", r.getId());
+            dto.put("descripcion", r.getDescripcion());
+            dto.put("latitud", r.getLatitud());
+            dto.put("longitud", r.getLongitud());
+            dto.put("direccion", r.getDireccion());
+            dto.put("nombreFoto", r.getNombreFoto());
+            dto.put("fecha", r.getFecha());
+            dto.put("estado", r.getEstado());
+            dtos.add(dto);
+        }
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/count")
