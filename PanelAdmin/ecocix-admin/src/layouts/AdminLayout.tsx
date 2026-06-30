@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import {
-  Drawer, IconButton, Typography, Box,
+  Drawer, Typography, Box,
   List, ListItemButton, ListItemIcon, ListItemText, Avatar,
 } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MapIcon from '@mui/icons-material/Map';
 import AssessmentIcon from '@mui/icons-material/Assessment';

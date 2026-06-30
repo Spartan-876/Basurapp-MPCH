@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Box, Typography, Card, CardContent, CircularProgress, Alert,
-  Chip, Button, Avatar, useTheme, alpha,
+  Chip, Button, Avatar, alpha,
 } from '@mui/material';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -11,7 +11,6 @@ import PageHeader from '../components/PageHeader';
 
 export default function CamionesPage() {
   const queryClient = useQueryClient();
-  const theme = useTheme();
 
   const { data: camiones = [], isLoading, error } = useQuery({
     queryKey: ['camiones'],
