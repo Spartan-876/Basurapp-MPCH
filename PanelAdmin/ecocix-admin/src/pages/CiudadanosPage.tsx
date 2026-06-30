@@ -3,7 +3,6 @@ import {
   Box, Typography, CircularProgress, Alert, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Avatar, Card, CardContent,
 } from '@mui/material';
-import PeopleIcon from '@mui/icons-material/People';
 import { adminService } from '../services/api';
 import PageHeader from '../components/PageHeader';
 
