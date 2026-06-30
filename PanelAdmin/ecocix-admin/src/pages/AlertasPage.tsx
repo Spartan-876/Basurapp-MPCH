@@ -9,6 +9,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import SendIcon from '@mui/icons-material/Send';
 import { adminService } from '../services/api';
+import PageHeader from '../components/PageHeader';
 
 export default function AlertasPage() {
   const [tipo, setTipo] = useState<'general' | 'camion'>('general');
@@ -24,9 +25,7 @@ export default function AlertasPage() {
 
   const mutation = useMutation({
     mutationFn: () => {
-      if (tipo === 'general') {
-        return adminService.enviarAlertaGeneral(mensaje);
-      }
+      if (tipo === 'general') return adminService.enviarAlertaGeneral(mensaje);
       return adminService.enviarAlertaCamion(idCamion, mensaje, radio);
     },
   });
@@ -39,19 +38,23 @@ export default function AlertasPage() {
 
   return (
     <Box>
-      <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>Alertas</Typography>
+      <PageHeader />
+      <Box sx={{ mt: 3 }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h5" sx={{ fontWeight: 700, color: '#151c27', fontFamily: 'Inter' }}>Alertas</Typography>
+        <Typography variant="body2" sx={{ color: '#404944', mt: 0.5, fontFamily: 'Inter' }}>
+          Envía notificaciones push a los ciudadanos registrados.
+        </Typography>
+      </Box>
 
       <Card>
-        <CardContent>
-          <ToggleButtonGroup
-            value={tipo} exclusive fullWidth
-            onChange={(_, v) => { if (v) setTipo(v); }}
-            sx={{ mb: 3 }}
-          >
-            <ToggleButton value="general">
+        <CardContent sx={{ p: '1.5rem !important' }}>
+          <ToggleButtonGroup value={tipo} exclusive fullWidth onChange={(_, v) => { if (v) setTipo(v); }}
+            sx={{ mb: 3 }}>
+            <ToggleButton value="general" sx={{ py: 1.5, fontWeight: 600, fontFamily: 'Inter' }}>
               <NotificationsIcon sx={{ mr: 1 }} /> Alerta General
             </ToggleButton>
-            <ToggleButton value="camion">
+            <ToggleButton value="camion" sx={{ py: 1.5, fontWeight: 600, fontFamily: 'Inter' }}>
               <LocalShippingIcon sx={{ mr: 1 }} /> Alerta por Camión
             </ToggleButton>
           </ToggleButtonGroup>
@@ -70,9 +73,7 @@ export default function AlertasPage() {
                   <InputLabel>Seleccionar camión</InputLabel>
                   <Select value={idCamion} label="Seleccionar camión"
                     onChange={e => setIdCamion(e.target.value)} required>
-                    <MenuItem value="">
-                      <em>-- Seleccionar camión --</em>
-                    </MenuItem>
+                    <MenuItem value=""><em>-- Seleccionar camión --</em></MenuItem>
                     {camiones.map((c) => (
                       <MenuItem key={c.idCamion} value={c.idCamion}>
                         {c.idCamion} — {c.placa} {c.activo ? '(Activo)' : '(Inactivo)'}
@@ -82,11 +83,10 @@ export default function AlertasPage() {
                 </FormControl>
 
                 <Box sx={{ mt: 2, px: 2 }}>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                  <Typography variant="body2" color="text.secondary" gutterBottom sx={{ fontFamily: 'Inter' }}>
                     Radio de alcance: {radio}m
                   </Typography>
-                  <Slider
-                    value={radio} onChange={(_, v) => setRadio(v as number)}
+                  <Slider value={radio} onChange={(_, v) => setRadio(v as number)}
                     min={50} max={1000} step={50} valueLabelDisplay="auto"
                     valueLabelFormat={(v) => `${v}m`}
                   />
@@ -110,7 +110,7 @@ export default function AlertasPage() {
             )}
 
             <Button
-              fullWidth variant="contained" type="submit" size="large" sx={{ mt: 3 }}
+              fullWidth variant="contained" type="submit" size="large" sx={{ mt: 3, py: 1.5, bgcolor: '#003527', '&:hover': { bgcolor: '#002117' }, fontWeight: 600, fontFamily: 'Inter' }}
               disabled={mutation.isPending || !mensaje}
               startIcon={mutation.isPending ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
             >
@@ -119,6 +119,7 @@ export default function AlertasPage() {
           </form>
         </CardContent>
       </Card>
+    </Box>
     </Box>
   );
 }

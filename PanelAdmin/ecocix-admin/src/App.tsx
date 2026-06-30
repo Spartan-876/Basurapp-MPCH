@@ -11,53 +11,61 @@ import CiudadanosPage from './pages/CiudadanosPage';
 import AdminUsersPage from './pages/AdminUsersPage';
 import AlertasPage from './pages/AlertasPage';
 import LiveMapPage from './pages/LiveMapPage';
+import ConfigPage from './pages/ConfigPage';
 
 const theme = createTheme({
   cssVariables: true,
   palette: {
-    primary: { main: '#1C1B1F', light: '#36343B', dark: '#121014', contrastText: '#FFFFFF' },
-    secondary: { main: '#48464C', light: '#605D64', dark: '#312F35', contrastText: '#FFFFFF' },
-    background: { default: '#FAFAFA', paper: '#FFFFFF' },
-    grey: { 50: '#FAFAFA', 100: '#F5F5F5', 200: '#EEEEEE', 300: '#E0E0E0', 400: '#BDBDBD', 800: '#424242' },
-    success: { main: '#2E7D32' },
+    primary: { main: '#003527', light: '#006c49', dark: '#002117', contrastText: '#FFFFFF' },
+    secondary: { main: '#006c49', light: '#4edea3', dark: '#005236', contrastText: '#FFFFFF' },
+    background: { default: '#f9f9ff', paper: '#FFFFFF' },
+    grey: { 50: '#f9f9ff', 100: '#f0f3ff', 200: '#e7eefe', 300: '#dce2f3', 400: '#bfc9c3', 500: '#707974', 800: '#404944' },
+    success: { main: '#006c49' },
     warning: { main: '#ED6C02' },
     info: { main: '#1976D2' },
-    error: { main: '#D32F2F' },
+    error: { main: '#ba1a1a' },
+    text: { primary: '#151c27', secondary: '#404944' },
+    divider: '#bfc9c3',
   },
   typography: {
-    fontFamily: '"Inter", "Plus Jakarta Sans", sans-serif',
-    h5: { fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700 },
-    h6: { fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700 },
-    subtitle1: { fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 600 },
-    button: { fontFamily: '"Inter", sans-serif', fontWeight: 600 },
+    fontFamily: '"Inter", sans-serif',
+    h4: { fontWeight: 700, fontSize: '32px', letterSpacing: '-0.02em', lineHeight: 1.2 },
+    h5: { fontWeight: 600, fontSize: '24px', letterSpacing: '-0.01em', lineHeight: 1.3 },
+    h6: { fontWeight: 600, fontSize: '20px', letterSpacing: '-0.01em', lineHeight: 1.4 },
+    subtitle1: { fontWeight: 600, fontSize: '16px' },
+    subtitle2: { fontWeight: 500, fontSize: '14px' },
+    body1: { fontWeight: 400, fontSize: '16px', lineHeight: 1.6 },
+    body2: { fontWeight: 400, fontSize: '14px', lineHeight: 1.5 },
+    caption: { fontWeight: 500, fontSize: '12px', letterSpacing: '0.02em', lineHeight: 1 },
+    button: { fontWeight: 600, letterSpacing: '0.01em' },
   },
-  shape: { borderRadius: 12 },
+  shape: { borderRadius: 8 },
   shadows: [
     'none',
     '0 1px 3px rgba(0,0,0,0.04)',
-    '0 2px 8px rgba(0,0,0,0.06)',
-    '0 4px 16px rgba(0,0,0,0.08)',
-    '0 6px 24px rgba(0,0,0,0.10)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
-    '0 8px 32px rgba(0,0,0,0.12)',
+    '0 2px 6px -1px rgba(0,0,0,0.06)',
+    '0 4px 6px -1px rgba(0,0,0,0.1)',
+    '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
   ],
   components: {
     MuiCssBaseline: {
@@ -68,15 +76,15 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-          border: '1px solid var(--mui-palette-grey-200)',
-          borderRadius: 16,
+          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+          borderRadius: 8,
+          backgroundColor: '#FFFFFF',
         },
       },
     },
     MuiPaper: {
       styleOverrides: {
-        root: { borderRadius: 12 },
+        root: { borderRadius: 8 },
         elevation0: { boxShadow: 'none' },
       },
     },
@@ -85,9 +93,17 @@ const theme = createTheme({
         root: {
           textTransform: 'none' as const,
           fontWeight: 600,
-          borderRadius: 10,
+          borderRadius: 8,
           boxShadow: 'none',
-          '&:hover': { boxShadow: '0 2px 8px rgba(0,0,0,0.12)' },
+          '&:hover': { boxShadow: '0 2px 6px -1px rgba(0,0,0,0.1)' },
+        },
+        contained: {
+          backgroundColor: '#003527',
+          '&:hover': { backgroundColor: '#002117' },
+        },
+        outlined: {
+          borderColor: '#bfc9c3',
+          '&:hover': { borderColor: '#003527', backgroundColor: 'rgba(0,53,39,0.04)' },
         },
       },
     },
@@ -95,8 +111,13 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           fontWeight: 600,
-          borderRadius: 8,
-          border: '1px solid var(--mui-palette-grey-200)',
+          borderRadius: 9999,
+          fontSize: 12,
+        },
+        filled: {
+          backgroundColor: 'rgba(0, 108, 73, 0.1)',
+          color: '#003527',
+          border: '1px solid rgba(0, 108, 73, 0.2)',
         },
       },
     },
@@ -104,13 +125,13 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiTableCell-root': {
-            backgroundColor: 'var(--mui-palette-grey-50)',
-            fontWeight: 700,
+            backgroundColor: '#f9f9ff',
+            fontWeight: 600,
+            fontSize: 12,
+            letterSpacing: '0.02em',
+            color: '#404944',
+            borderBottom: '1px solid #e7eefe',
             textTransform: 'uppercase' as const,
-            fontSize: 11,
-            letterSpacing: '0.05em',
-            color: 'var(--mui-palette-text-secondary)',
-            borderBottom: '1px solid var(--mui-palette-grey-200)',
           },
         },
       },
@@ -119,10 +140,11 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiTableRow-root:hover': {
-            backgroundColor: 'var(--mui-palette-grey-50)',
+            backgroundColor: '#f0f3ff',
           },
           '& .MuiTableCell-root': {
-            borderBottom: '1px solid var(--mui-palette-grey-100)',
+            borderBottom: '1px solid #f0f3ff',
+            fontSize: 14,
           },
         },
       },
@@ -139,7 +161,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            borderRadius: 10,
+            borderRadius: 8,
           },
         },
       },
@@ -147,30 +169,28 @@ const theme = createTheme({
     MuiSelect: {
       styleOverrides: {
         root: {
-          borderRadius: 10,
+          borderRadius: 8,
         },
       },
     },
     MuiDialog: {
       styleOverrides: {
         paper: {
-          borderRadius: 16,
-          boxShadow: '0 12px 48px rgba(0,0,0,0.15)',
+          borderRadius: 12,
+          boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
         },
       },
     },
     MuiAlert: {
       styleOverrides: {
-        root: {
-          borderRadius: 10,
-        },
+        root: { borderRadius: 8 },
       },
     },
     MuiToggleButtonGroup: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
-          border: '1px solid var(--mui-palette-grey-200)',
+          borderRadius: 8,
+          border: '1px solid #e7eefe',
           overflow: 'hidden',
         },
       },
@@ -182,17 +202,15 @@ const theme = createTheme({
           fontWeight: 600,
           borderRadius: 0,
           '&.Mui-selected': {
-            backgroundColor: 'var(--mui-palette-primary-main)',
-            color: 'var(--mui-palette-primary-contrastText)',
+            backgroundColor: '#003527',
+            color: '#FFFFFF',
           },
         },
       },
     },
     MuiSlider: {
       styleOverrides: {
-        root: {
-          color: 'var(--mui-palette-primary-main)',
-        },
+        root: { color: '#003527' },
       },
     },
   },
@@ -226,6 +244,7 @@ function App() {
               <Route path="ciudadanos" element={<CiudadanosPage />} />
               <Route path="admins" element={<AdminUsersPage />} />
               <Route path="alertas" element={<AlertasPage />} />
+              <Route path="configuracion" element={<ConfigPage />} />
             </Route>
           </Routes>
         </AuthProvider>
