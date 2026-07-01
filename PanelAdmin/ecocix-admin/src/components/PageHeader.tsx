@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  Box, Toolbar, IconButton, Typography, Avatar, Badge,
+  Box, Toolbar, IconButton, Typography, Avatar, Badge, Tooltip,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 interface PageHeaderProps {
   onMenuClick?: () => void;
@@ -12,7 +13,7 @@ interface PageHeaderProps {
 }
 
 export default function PageHeader({ onMenuClick, showMenuButton = false }: PageHeaderProps) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -48,6 +49,12 @@ export default function PageHeader({ onMenuClick, showMenuButton = false }: Page
             </Typography>
           </Box>
         </Box>
+
+        <Tooltip title="Cerrar Sesión">
+          <IconButton onClick={logout} sx={{ ml: 1.5, color: '#404944', '&:hover': { color: '#ba1a1a' } }}>
+            <LogoutIcon />
+          </IconButton>
+        </Tooltip>
       </Toolbar>
     </Box>
   );
